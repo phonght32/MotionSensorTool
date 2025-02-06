@@ -140,7 +140,7 @@ class ComponentSerial(QWidget):
                 self.__current_SerialPortOpened__ = True
                 self.__timerGetData__ = QTimer(self)
                 self.__timerGetData__.timeout.connect(self.TaskGetData)
-                self.__timerGetData__.start(1)
+                self.__timerGetData__.start(100)
                 print('Connect to {}'.format(self.__current_SelectedDeviceName__))
 
             else:

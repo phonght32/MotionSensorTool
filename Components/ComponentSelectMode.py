@@ -1,8 +1,8 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QRadioButton, QButtonGroup
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QRadioButton, QButtonGroup
 
 from Components.ComponentAll import *
-from Components.ComponentAnalyzeMag import *
+from Components.ComponentMag import *
 from Utils.LoadConfigFile import *
 
 MODE_IDX_ANALYZE_MAG = 0
@@ -26,7 +26,8 @@ class ComponentSelectMode(QWidget):
 		self.radiobutton_AnalyzeAll.setChecked(self.configModeData['showComponentAll']) 
 
 
-		ComponentAnalyzeMag().setVisible(self.configModeData['showComponentAnalyzeMag'])
+		ComponentMagPlotter().setVisible(self.configModeData['showComponentAnalyzeMag'])
+		ComponentMagAnalyze().setVisible(self.configModeData['showComponentAnalyzeMag'])
 		ComponentAll().setVisible(self.configModeData['showComponentAll'])
 
 		self.groupRadioButton = QButtonGroup(self)
@@ -39,8 +40,9 @@ class ComponentSelectMode(QWidget):
 		# layout.addWidget(self.radiobutton_AnalyzeAccel)
 		# layout.addWidget(self.radiobutton_AnalyzeGyro)
 		layout.addWidget(self.radiobutton_AnalyzeMag)
-		# layout.addWidget(self.radiobutton_AnalyzeBaro)
+		# layout.addWidget(self.radiobutton_Ancd LoadConfigFilecdalyzeBaro)
 		layout.addWidget(self.radiobutton_AnalyzeAll)
+
 
 
 		self.setLayout(layout)
@@ -49,9 +51,11 @@ class ComponentSelectMode(QWidget):
 		self.__currentModeIdx__ = self.groupRadioButton.id(object)
 
 		if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
-			ComponentAnalyzeMag().setVisible(True)
+			ComponentMagPlotter().setVisible(True)
+			ComponentMagAnalyze().setVisible(True)
 			ComponentAll().setVisible(False)
 		elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ALL:
-			ComponentAnalyzeMag().setVisible(False)
+			ComponentMagPlotter().setVisible(False)
+			ComponentMagAnalyze().setVisible(False)
 			ComponentAll().setVisible(True)
 
