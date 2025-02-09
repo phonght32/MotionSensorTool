@@ -32,6 +32,7 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig2D_axes.grid(True)
 
         self.pyplotFig3D = plt.figure()
+        self.pyplotFig3D.canvas.mpl_connect('motion_notify_event', self.on_move)
 
         self.pyplotFig3D_Axes_RawData = self.pyplotFig3D.add_subplot(121, projection='3d')
         self.pyplotFig3D_Axes_RawData.grid(True)
@@ -39,14 +40,14 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_RawData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_RawData.set_zlabel('MagZ')
 
-        self.pyplotFig3D_Axes_CalibData = self.pyplotFig3D.add_subplot(122, projection='3d', 
-            sharex=self.pyplotFig3D_Axes_RawData)
+        self.pyplotFig3D_Axes_CalibData = self.pyplotFig3D.add_subplot(122, projection='3d')
         self.pyplotFig3D_Axes_CalibData.grid(True)
         self.pyplotFig3D_Axes_CalibData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_CalibData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_CalibData.set_zlabel('MagZ')
 
-        self.pyplotFig3D_Axes_RawData.shareview(self.pyplotFig3D_Axes_CalibData)
+
+        # self.pyplotFig3D_Axes_CalibData.shareview(self.pyplotFig3D_Axes_RawData)
 
         self.widgetFig2D = FigureCanvasQTAgg(self.pyplotFig2D)
         self.widgetFig3D = FigureCanvasQTAgg(self.pyplotFig3D)
@@ -56,12 +57,11 @@ class ComponentMagPlotter(QWidget):
         layout.addWidget(self.widgetToolbar)
         layout.addWidget(self.widgetFig2D)
         layout.addWidget(self.widgetFig3D)
-
         self.setLayout(layout)
 
         self.CntDisplay3D = 0
 
-
+        
 
     def runtimePlotMagData(self, Time=[], RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
 
@@ -125,6 +125,28 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_CalibData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_CalibData.set_zlabel('MagZ')
         plt.draw()
+
+    def on_move(self, event):
+        if event.inaxes == self.pyplotFig3D_Axes_RawData:
+            if self.pyplotFig3D_Axes_RawData.button_pressed in self.pyplotFig3D_Axes_RawData._rotate_btn:
+                self.pyplotFig3D_Axes_CalibData.view_init(elev=self.pyplotFig3D_Axes_RawData.elev, azim=self.pyplotFig3D_Axes_RawData.azim)
+            elif self.pyplotFig3D_Axes_RawData.button_pressed in self.pyplotFig3D_Axes_RawData._zoom_btn:
+                self.pyplotFig3D_Axes_CalibData.set_xlim3d(self.pyplotFig3D_Axes_RawData.get_xlim3d())
+                self.pyplotFig3D_Axes_CalibData.set_ylim3d(self.pyplotFig3D_Axes_RawData.get_ylim3d())
+                self.pyplotFig3D_Axes_CalibData.set_zlim3d(self.pyplotFig3D_Axes_RawData.get_zlim3d())
+        elif event.inaxes == self.pyplotFig3D_Axes_CalibData:
+            if self.pyplotFig3D_Axes_CalibData.button_pressed in self.pyplotFig3D_Axes_CalibData._rotate_btn:
+                self.pyplotFig3D_Axes_RawData.view_init(elev=self.pyplotFig3D_Axes_CalibData.elev, azim=self.pyplotFig3D_Axes_CalibData.azim)
+            elif self.pyplotFig3D_Axes_CalibData.button_pressed in self.pyplotFig3D_Axes_CalibData._zoom_btn:
+                self.pyplotFig3D_Axes_RawData.set_xlim3d(self.pyplotFig3D_Axes_CalibData.get_xlim3d())
+                self.pyplotFig3D_Axes_RawData.set_ylim3d(self.pyplotFig3D_Axes_CalibData.get_ylim3d())
+                self.pyplotFig3D_Axes_RawData.set_zlim3d(self.pyplotFig3D_Axes_CalibData.get_zlim3d())
+        else:
+            return
+        self.pyplotFig3D.canvas.draw_idle()
+        # print('move')
+
+        
 
 @singleton
 class ComponentMagAnalyze(QWidget):
