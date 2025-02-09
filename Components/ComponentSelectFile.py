@@ -40,7 +40,10 @@ class ComponentSelectFile(QWidget):
 		if dialog.exec():
 			filePath, = dialog.selectedFiles()
 			if filePath:
-				self.__current_FileContent__ = ''
+
+				self.__current_SelectedFilePath__ = filePath
+				self.__label_SelectedFilePath__.setText(os.path.basename(self.__current_SelectedFilePath__))
+
 				with open(filePath, 'r') as file:
 					self.__current_FileContent__ = file.read()
 

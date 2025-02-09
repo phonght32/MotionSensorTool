@@ -72,9 +72,9 @@ class MainWindow(QMainWindow):
     def callbackLoadFile(self, file_content):
         list_data = file_content.splitlines()
         Time = []
-        RawData_MagX = []
-        RawData_MagY = []
-        RawData_MagZ = []
+        self.RawData_MagX = []
+        self.RawData_MagY = []
+        self.RawData_MagZ = []
 
         currentTime = 0.0
 
@@ -83,11 +83,12 @@ class MainWindow(QMainWindow):
             
             Time.append(currentTime)
             currentTime += 0.1
-            RawData_MagX.append(int(splitData[0]))
-            RawData_MagY.append(int(splitData[1]))
-            RawData_MagZ.append(int(splitData[2]))
+            self.RawData_MagX.append(int(splitData[0]))
+            self.RawData_MagY.append(int(splitData[1]))
+            self.RawData_MagZ.append(int(splitData[2]))
 
-        self.componentMagPlotter.plotMagData(Time, RawData_MagX, RawData_MagY, RawData_MagZ)
+        self.componentMagAnalyze.setMagData(self.RawData_MagX, self.RawData_MagY, self.RawData_MagZ)
+        self.componentMagPlotter.plotMagData(Time, self.RawData_MagX, self.RawData_MagY, self.RawData_MagZ)
 
         # print(file_content)
 
