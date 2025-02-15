@@ -1,4 +1,4 @@
 {
-	"showComponentAll": 0,
-	"showComponentAnalyzeMag": 1
+	"enable_serial_plotter": 0,
+	"enable_mag_analyze": 1
 }

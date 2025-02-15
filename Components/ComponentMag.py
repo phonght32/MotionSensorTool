@@ -1,4 +1,8 @@
+import sys, os, re
+import numpy as np
+from scipy import linalg
 import matplotlib
+
 matplotlib.use('QtAgg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 import matplotlib.pyplot as plt
@@ -7,14 +11,11 @@ import matplotlib.pyplot as plt
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QLineEdit, QPushButton
 from PyQt6.QtCore import Qt
 
+from Widgets.WidgetSelectFile import *
 from Utils.Singleton import *
 from Dimension.Dimension import *
 
-import numpy as np
-from scipy import linalg
 
-
-DISPLAY_INTERVAL = 15
 
 DIMENSION_MATRIX_TYPE = 100
 DIMENSION_MATRIX_VALUE_WIDTH = 80
@@ -28,6 +29,7 @@ class ComponentMagPlotter(QWidget):
         super().__init__()
 
         self.pyplotFig2D = plt.figure()
+
         self.pyplotFig2D_axes = self.pyplotFig2D.add_subplot(111)
         self.pyplotFig2D_axes.grid(True)
 
@@ -62,37 +64,7 @@ class ComponentMagPlotter(QWidget):
         self.CntDisplay3D = 0
 
         
-
-    def runtimePlotMagData(self, Time=[], RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
-
-        self.pyplotFig2D_axes.cla()
-        self.pyplotFig2D_axes.plot(Time, RawData_MagX, label='MagX')
-        self.pyplotFig2D_axes.plot(Time, RawData_MagY, label='MagY')
-        self.pyplotFig2D_axes.plot(Time, RawData_MagZ, label='MagZ')
-        self.pyplotFig2D_axes.grid(True)
-        self.pyplotFig2D_axes.legend()
-
-        lim_max = Time[-1]
-        if lim_max - DISPLAY_INTERVAL > 0:
-            lim_min = lim_max - DISPLAY_INTERVAL
-        else:
-            lim_min = 0
-        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max])
-        self.widgetFig2D.draw()
-
-        self.CntDisplay3D += 1
-        if self.CntDisplay3D == 10:
-            self.CntDisplay3D = 0
-
-            self.pyplotFig3D_Axes_RawData.cla()
-            self.pyplotFig3D_Axes_RawData.scatter(RawData_MagX, RawData_MagY, RawData_MagZ)
-            self.pyplotFig3D_Axes_RawData.grid(True)
-            self.pyplotFig3D_Axes_RawData.set_xlabel('MagX')
-            self.pyplotFig3D_Axes_RawData.set_ylabel('MagY')
-            self.pyplotFig3D_Axes_RawData.set_zlabel('MagZ')
-            plt.draw()
-
-    def plotMagData(self, Time=[], RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
+    def plotRawData(self, Time=[], RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
 
         self.pyplotFig2D_axes.cla()
         self.pyplotFig2D_axes.plot(Time, RawData_MagX, label='MagX')
@@ -100,31 +72,24 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig2D_axes.plot(Time, RawData_MagZ, label='MagZ')
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.legend()
-
-        lim_max = Time[-1]
-        if lim_max - DISPLAY_INTERVAL > 0:
-            lim_min = lim_max - DISPLAY_INTERVAL
-        else:
-            lim_min = 0
-        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max])
         self.widgetFig2D.draw()
 
         self.pyplotFig3D_Axes_RawData.cla()
-        self.pyplotFig3D_Axes_RawData.scatter(RawData_MagX, RawData_MagY, RawData_MagZ)
         self.pyplotFig3D_Axes_RawData.grid(True)
         self.pyplotFig3D_Axes_RawData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_RawData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_RawData.set_zlabel('MagZ')
-        plt.draw()
+        self.pyplotFig3D_Axes_RawData.scatter(RawData_MagX, RawData_MagY, RawData_MagZ)
+        self.pyplotFig3D.canvas.draw_idle()
 
-    def plotCalibMagData(self, Time=[], CalibData_MagX=[], CalibData_MagY=[], CalibData_MagZ=[]):
+    def plotCalibData(self, Time=[], CalibData_MagX=[], CalibData_MagY=[], CalibData_MagZ=[]):
         self.pyplotFig3D_Axes_CalibData.cla()
         self.pyplotFig3D_Axes_CalibData.scatter(CalibData_MagX, CalibData_MagY, CalibData_MagZ)
         self.pyplotFig3D_Axes_CalibData.grid(True)
         self.pyplotFig3D_Axes_CalibData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_CalibData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_CalibData.set_zlabel('MagZ')
-        plt.draw()
+        self.pyplotFig3D.canvas.draw_idle()
 
     def on_move(self, event):
         if event.inaxes == self.pyplotFig3D_Axes_RawData:
@@ -144,7 +109,6 @@ class ComponentMagPlotter(QWidget):
         else:
             return
         self.pyplotFig3D.canvas.draw_idle()
-        # print('move')
 
         
 
@@ -169,11 +133,12 @@ class ComponentMagAnalyze(QWidget):
         self.__current_SoftIron_m32__ = '0.0'
         self.__current_SoftIron_m33__ = '0.0'
 
-        self.RawData_MagX = []
-        self.RawData_MagY = []
-        self.RawData_MagZ = []
-
+        self.rawData = []
+        self.calibData = []
         self.TimeCalibMag = []
+
+
+        self.__widget_SelectFile__ = WidgetSelectFile(self.onLoadFile)
 
         self.initWidgetNormOfMagnetic()
         self.initWidgetButtonAction()
@@ -182,6 +147,7 @@ class ComponentMagAnalyze(QWidget):
         
 
         layout = QVBoxLayout()
+        layout.addWidget(self.__widget_SelectFile__)
         layout.addWidget(self.__widget_NormOfMagnetic__)
         layout.addWidget(self.__widget_ButtonAction_)
         layout.addWidget(self.__widget_HardIronBias__)
@@ -190,97 +156,26 @@ class ComponentMagAnalyze(QWidget):
 
         self.setLayout(layout)
 
-    def setMagData(self, RawData_MagX, RawData_MagY, RawData_MagZ):
-        self.RawData_MagX = RawData_MagX
-        self.RawData_MagY = RawData_MagY
-        self.RawData_MagZ = RawData_MagZ
-
+    def onLoadFile(self, filePath):
         
+        data = np.loadtxt(filePath, delimiter=',')
+        num_samples = data.shape[0]
+
+        Time = []
+        currentTime = 0.0
+        for idx in range(num_samples):
+            Time.append(currentTime)
+            currentTime += 0.1
+
+        self.rawData = data
+        ComponentMagPlotter().plotRawData(Time, self.rawData[:,0], self.rawData[:,1], self.rawData[:,2])
+
+ 
 
     def onChangeNormOfMagnetic(self, text):
         self.__current_NormOfGravity__ = text
 
-    def onCalibrate(self):
-        F   = int(self.__current_NormOfGravity__)
-        b   = np.zeros([3, 1])
-        A_1 = np.eye(3)
-
-        raw = [self.RawData_MagX, self.RawData_MagY, self.RawData_MagZ]
-        s= np.array(raw)
-        M, n, d = self.__ellipsoid_fit(s)
-
-        # calibration parameters
-        M_1 = linalg.inv(M)
-        b = -np.dot(M_1, n)
-        A_1 = np.real(F / np.sqrt(np.dot(n.T, np.dot(M_1, n)) - d) * linalg.sqrtm(M))
-        
-        # print("M:\n", M, "\nn:\n", n, "\nd:\n", d)        
-        # print("M_1:\n",M_1, "\nb:\n", b, "\nA_1:\n", A_1)
-        
-        # print("Soft iron transformation matrix:\n",A_1)
-        # print("Hard iron bias:\n", b)
-
-
-        
-        self.CalibData_MagX = []
-        self.CalibData_MagY = []
-        self.CalibData_MagZ = []
-        self.CalibTime = []
-
-        currentTime = 0.0
-
-        data = np.array(s).T
-        for row in data: 
-        
-            # subtract the hard iron offset
-            xm_off  = row[0]-b[0]
-            ym_off  = row[1]-b[1]
-            zm_off  = row[2]-b[2]
-            
-            #multiply by the inverse soft iron offset
-            xm_cal = xm_off *  A_1[0,0] + ym_off *  A_1[0,1]  + zm_off *  A_1[0,2] 
-            ym_cal = xm_off *  A_1[1,0] + ym_off *  A_1[1,1]  + zm_off *  A_1[1,2] 
-            zm_cal = xm_off *  A_1[2,0] + ym_off *  A_1[2,1]  + zm_off *  A_1[2,2] 
-
-            self.CalibData_MagX.append(xm_cal)
-            self.CalibData_MagY.append(ym_cal)
-            self.CalibData_MagZ.append(zm_cal)
-
-            self.CalibTime.append(currentTime)
-            currentTime += 0.1
-
-
-        self.__current_HardIronBias_b1__ = str(b[0][0])
-        self.__current_HardIronBias_b2__ = str(b[1][0])
-        self.__current_HardIronBias_b3__ = str(b[2][0])
-
-        self.__current_SoftIron_m11__ = str(A_1[0,0])
-        self.__current_SoftIron_m12__ = str(A_1[1,0])
-        self.__current_SoftIron_m13__ = str(A_1[2,0])
-        self.__current_SoftIron_m21__ = str(A_1[0,1])
-        self.__current_SoftIron_m22__ = str(A_1[1,1])
-        self.__current_SoftIron_m23__ = str(A_1[2,1])
-        self.__current_SoftIron_m31__ = str(A_1[0,2])
-        self.__current_SoftIron_m32__ = str(A_1[1,2])
-        self.__current_SoftIron_m33__ = str(A_1[2,2])
-
-        self.__label_HardIronBias_b1__.setText(self.__current_HardIronBias_b1__)
-        self.__label_HardIronBias_b2__.setText(self.__current_HardIronBias_b2__)
-        self.__label_HardIronBias_b3__.setText(self.__current_HardIronBias_b3__)
-
-        self.__label_SoftIron_m11__.setText(self.__current_SoftIron_m11__)
-        self.__label_SoftIron_m12__.setText(self.__current_SoftIron_m12__)
-        self.__label_SoftIron_m13__.setText(self.__current_SoftIron_m13__)
-        self.__label_SoftIron_m21__.setText(self.__current_SoftIron_m21__)
-        self.__label_SoftIron_m22__.setText(self.__current_SoftIron_m22__)
-        self.__label_SoftIron_m23__.setText(self.__current_SoftIron_m23__)
-        self.__label_SoftIron_m31__.setText(self.__current_SoftIron_m31__)
-        self.__label_SoftIron_m32__.setText(self.__current_SoftIron_m32__)
-        self.__label_SoftIron_m33__.setText(self.__current_SoftIron_m33__)
-
-        ComponentMagPlotter().plotCalibMagData(self.CalibTime, self.CalibData_MagX, self.CalibData_MagY, self.CalibData_MagZ)
-
-
+    
 
     def initWidgetNormOfMagnetic(self):
         self.__label_NormOfGravity__ = QLabel('Norm of Magnetic or Gravity:')
@@ -290,6 +185,7 @@ class ComponentMagAnalyze(QWidget):
         self.__input_NormOfMagnetic__.textChanged.connect(self.onChangeNormOfMagnetic)
         
         self.__widget_NormOfMagnetic_Layout__ = QHBoxLayout()
+        self.__widget_NormOfMagnetic_Layout__.setContentsMargins(0, 0, 0, 0)
         self.__widget_NormOfMagnetic_Layout__.addWidget(self.__label_NormOfGravity__)
         self.__widget_NormOfMagnetic_Layout__.addWidget(self.__input_NormOfMagnetic__)
         self.__widget_NormOfMagnetic__ = QWidget()
@@ -324,6 +220,7 @@ class ComponentMagAnalyze(QWidget):
 
 
         self.__widget_HardIronBias_Layout__ = QHBoxLayout()
+        self.__widget_HardIronBias_Layout__.setContentsMargins(0, 0, 0, 0)
         self.__widget_HardIronBias_Layout__.addWidget(self.__label_HardIronBias__)
         self.__widget_HardIronBias_Layout__.addWidget(self.__label_HardIronBias_b1__)
         self.__widget_HardIronBias_Layout__.addWidget(self.__label_HardIronBias_b2__)
@@ -372,6 +269,7 @@ class ComponentMagAnalyze(QWidget):
         self.__label_SoftIron_m33__.setStyleSheet(BORDER_MAXTRIX_VALUE)
 
         self.__widget_SoftIron_Layout__ = QGridLayout()
+        self.__widget_SoftIron_Layout__.setContentsMargins(0, 0, 0, 0)
         self.__widget_SoftIron_Layout__.addWidget(self.__label_SoftIron__, 0, 0)
         self.__widget_SoftIron_Layout__.addWidget(self.__label_SoftIron_m11__, 0, 1)
         self.__widget_SoftIron_Layout__.addWidget(self.__label_SoftIron_m12__, 0, 2)
@@ -385,6 +283,79 @@ class ComponentMagAnalyze(QWidget):
 
         self.__widget_SoftIron__ = QWidget()
         self.__widget_SoftIron__.setLayout(self.__widget_SoftIron_Layout__)
+
+    def onCalibrate(self):
+
+        F   = int(self.__current_NormOfGravity__)
+        b   = np.zeros([3, 1])
+        A_1 = np.eye(3)
+
+        s = self.rawData.T
+        M, n, d = self.__ellipsoid_fit(s)
+
+
+        # calibration parameters
+        M_1 = linalg.inv(M)
+        b = -np.dot(M_1, n)
+        A_1 = np.real(F / np.sqrt(np.dot(n.T, np.dot(M_1, n)) - d) * linalg.sqrtm(M))
+        
+        self.calibData = np.empty((0,3), int)
+
+        self.CalibTime = []
+
+        currentTime = 0.0
+
+        data = np.array(s).T
+        for row in data: 
+        
+            # subtract the hard iron offset
+            xm_off  = row[0]-b[0]
+            ym_off  = row[1]-b[1]
+            zm_off  = row[2]-b[2]
+            
+            #multiply by the inverse soft iron offset
+            xm_cal = xm_off *  A_1[0,0] + ym_off *  A_1[0,1]  + zm_off *  A_1[0,2] 
+            ym_cal = xm_off *  A_1[1,0] + ym_off *  A_1[1,1]  + zm_off *  A_1[1,2] 
+            zm_cal = xm_off *  A_1[2,0] + ym_off *  A_1[2,1]  + zm_off *  A_1[2,2] 
+
+            self.calibData = np.append(self.calibData, np.array([[xm_cal[0], ym_cal[0], zm_cal[0]]]), axis=0)
+            
+            self.CalibTime.append(currentTime)
+            currentTime += 0.1
+
+
+
+        self.__current_HardIronBias_b1__ = str(b[0][0])
+        self.__current_HardIronBias_b2__ = str(b[1][0])
+        self.__current_HardIronBias_b3__ = str(b[2][0])
+
+        self.__current_SoftIron_m11__ = str(A_1[0,0])
+        self.__current_SoftIron_m12__ = str(A_1[1,0])
+        self.__current_SoftIron_m13__ = str(A_1[2,0])
+        self.__current_SoftIron_m21__ = str(A_1[0,1])
+        self.__current_SoftIron_m22__ = str(A_1[1,1])
+        self.__current_SoftIron_m23__ = str(A_1[2,1])
+        self.__current_SoftIron_m31__ = str(A_1[0,2])
+        self.__current_SoftIron_m32__ = str(A_1[1,2])
+        self.__current_SoftIron_m33__ = str(A_1[2,2])
+
+        self.__label_HardIronBias_b1__.setText(self.__current_HardIronBias_b1__)
+        self.__label_HardIronBias_b2__.setText(self.__current_HardIronBias_b2__)
+        self.__label_HardIronBias_b3__.setText(self.__current_HardIronBias_b3__)
+
+        self.__label_SoftIron_m11__.setText(self.__current_SoftIron_m11__)
+        self.__label_SoftIron_m12__.setText(self.__current_SoftIron_m12__)
+        self.__label_SoftIron_m13__.setText(self.__current_SoftIron_m13__)
+        self.__label_SoftIron_m21__.setText(self.__current_SoftIron_m21__)
+        self.__label_SoftIron_m22__.setText(self.__current_SoftIron_m22__)
+        self.__label_SoftIron_m23__.setText(self.__current_SoftIron_m23__)
+        self.__label_SoftIron_m31__.setText(self.__current_SoftIron_m31__)
+        self.__label_SoftIron_m32__.setText(self.__current_SoftIron_m32__)
+        self.__label_SoftIron_m33__.setText(self.__current_SoftIron_m33__)
+
+        ComponentMagPlotter().plotCalibData(self.CalibTime, self.calibData[:,0], self.calibData[:,1], self.calibData[:,2])
+
+
 
     def __ellipsoid_fit(self, s):
         ''' Estimate ellipsoid parameters from a set of points.

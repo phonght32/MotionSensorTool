@@ -31,7 +31,7 @@ ListBaudrateValue = [
 ]
 
 @singleton
-class ComponentSerial(QWidget):
+class ComponentSerialControl(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -45,7 +45,6 @@ class ComponentSerial(QWidget):
 
         self.__callback_GetData__ = None
 
-        # Create widgets for select COM Port 
         self.__label_ComPort__ = QLabel('COM')
         self.__label_ComPort__.setFixedWidth(DIMENSION_LABEL_WIDTH)
 
@@ -58,7 +57,6 @@ class ComponentSerial(QWidget):
         self.__button_Connect__.clicked.connect(self.onClickConnect)
 
 
-        #Create widgets for select baudrate
         self.__label_Baudrate = QLabel('Baud rates')
         self.__label_Baudrate.setFixedWidth(DIMENSION_LABEL_WIDTH)
 
@@ -67,6 +65,9 @@ class ComponentSerial(QWidget):
         self.__combobox_Baudrates__.addItems(ListBaudrate)
         self.__combobox_Baudrates__.setCurrentText(ListBaudrate[self.__current_SelectedBaudrateIdx__])
         self.__combobox_Baudrates__.currentIndexChanged.connect(self.onChangeBaudrates)
+
+        self.__label_DataBits__ = QLabel('Data bits')
+        self.__label_DataBits__.setFixedWidth(DIMENSION_LABEL_WIDTH)
 
 
 
@@ -81,14 +82,17 @@ class ComponentSerial(QWidget):
         currentRowIdx += 1
         layout.addWidget(self.__label_Baudrate, currentRowIdx, 1)
         layout.addWidget(self.__combobox_Baudrates__, currentRowIdx, 2)
+        
+        currentRowIdx += 1
+        layout.addWidget(self.__label_DataBits__, currentRowIdx, 1)
+        # layout.addWidget(self.__combobox_Baudrates__, currentRowIdx, 2)
 
         self.setLayout(layout)
 
         scanTimer = QTimer(self)
-        scanTimer.timeout.connect(self.SearchDevCP210x)
-        scanTimer.start(1000)
+        scanTimer.timeout.connect(self.searchDevCP210x)
+        scanTimer.start(500)
 
-        self.num_read = 0
 
     def createButtonControl(self):
 
@@ -104,7 +108,7 @@ class ComponentSerial(QWidget):
         return self.__buttonControlWidget__
 
 
-    def SearchDevCP210x(self):
+    def searchDevCP210x(self):
         COMs=[]
         pts= prtlst.comports()
 
@@ -135,7 +139,10 @@ class ComponentSerial(QWidget):
     def onClickConnect(self):
         if self.__current_SerialPortOpened__ == False:
             if self.__current_SelectedDeviceName__ != '':
-                self.__current_SerialPort__ = serial.Serial(self.__current_SelectedDeviceName__, ListBaudrateValue[self.__current_SelectedBaudrateIdx__], timeout=0.001, xonxoff=False)
+                self.__current_SerialPort__ = serial.Serial(self.__current_SelectedDeviceName__, 
+                                                            ListBaudrateValue[self.__current_SelectedBaudrateIdx__], 
+                                                            timeout=0.001, 
+                                                            xonxoff=False)
                 self.__button_Connect__.setText('Disconnect')
                 self.__current_SerialPortOpened__ = True
                 self.__timerGetData__ = QTimer(self)
@@ -159,11 +166,9 @@ class ComponentSerial(QWidget):
             binary_string = self.__current_SerialPort__.readline()
             self.__callback_GetData__(timestamp, binary_string)
 
-            # binary_string = self.__current_SerialPort__.read()
-            # print('{} {}'.format(self.num_read, binary_string))
             
 
-    def registerCallbackAnalyze(self, callback):
+    def registerOnReceivedData(self, callback):
         self.__callback_GetData__ = callback
 
 
