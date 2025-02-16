@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QGridLayout, QPushButton, QLineEdit, QPlainTextEdit
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QGridLayout, QPushButton, QLineEdit, QPlainTextEdit, QFileDialog
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6 import QtTest
 from Dimension.Dimension import *
@@ -143,6 +143,24 @@ class ComponentSerialControl(QWidget):
         logging.getLogger('matplotlib.font_manager').disabled = True
 
 
+        self.__button_SerialControl_Save__ = QPushButton('Save')
+        self.__button_SerialControl_Save__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
+        self.__button_SerialControl_Save__.clicked.connect(self.onClickSaveConsole)
+
+        self.__button_SerialControl_Clear__ = QPushButton('Clear')
+        self.__button_SerialControl_Clear__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
+        self.__button_SerialControl_Clear__.clicked.connect(self.onClickClearConsole)
+
+        self.__layout_ControlButton__ = QHBoxLayout()
+        self.__layout_ControlButton__.setContentsMargins(0,0,0,0)
+        self.__layout_ControlButton__.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Clear__)
+        self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Save__)
+        self.__widget_ControlButton__ = QWidget()
+        self.__widget_ControlButton__.setLayout(self.__layout_ControlButton__)
+
+
+
 
         self.__serialSetting_layout__ = QGridLayout()
         self.__serialSetting_layout__.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -174,26 +192,32 @@ class ComponentSerialControl(QWidget):
 
         layout = QVBoxLayout()
         layout.addWidget(self.__serialSetting_widget__)
-        layout.addWidget(self.__console__.widget, 1)
+        layout.addWidget(self.__console__.widget)
+        layout.addWidget(self.__widget_ControlButton__)
         self.setLayout(layout)
 
         scanTimer = QTimer(self)
         scanTimer.timeout.connect(self.searchDevCP210x)
         scanTimer.start(500)
 
+    def onClickSaveConsole(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.FileMode.AnyFile)
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
 
-    def createButtonControl(self):
+        fileName, fileType = dialog.getSaveFileName(self)
+        if fileName:
+            consoleData = ComponentConsole().getCurrentText()
 
-        self.__buttonAnalyzeData__ = QPushButton('Start')
-        self.__buttonAnalyzeData__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
+            if '.txt' not in fileName:
+                fileName += '.txt'
+                
+            with open(fileName, 'w') as output:
+                output.write(consoleData)
 
-        self.__buttonControlLayout__ = QHBoxLayout()
-        self.__buttonControlLayout__.addWidget(self.__buttonAnalyzeData__)
-        self.__buttonControlLayout__.setAlignment(Qt.AlignmentFlag.AlignBottom)
-        self.__buttonControlWidget__ = QWidget()
-        self.__buttonControlWidget__.setLayout(self.__buttonControlLayout__)
 
-        return self.__buttonControlWidget__
+    def onClickClearConsole(self):
+        ComponentConsole().clear()
 
 
     def searchDevCP210x(self):

@@ -35,8 +35,6 @@ class MainWindow(QMainWindow):
         leftPanelLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         leftPanelLayout.addWidget(self.componentSerialControl)
         leftPanelLayout.addWidget(self.componentMagAnalyze)
-        # leftPanelLayout.addStretch()
-        # leftPanelLayout.addWidget(self.componentSelectMode)
         leftPanelWidget = QWidget()
         leftPanelWidget.setFixedWidth(550)
         leftPanelWidget.setLayout(leftPanelLayout)

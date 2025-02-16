@@ -45,7 +45,7 @@ class ComponentConsole(logging.Handler):
 	def clear(self):
 		self.widget.clear()
 
-	def getCurrentText():
+	def getCurrentText(self):
 		return self.widget.toPlainText()
 
 	def logDebug(self, *arg):

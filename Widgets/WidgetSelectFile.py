@@ -22,6 +22,7 @@ class WidgetSelectFile(QWidget):
 		self.__label_SelectedFilePath__.setFixedWidth(DIMENSION_COMBOBOX_WIDTH)
 
 		self.__button_LoadFile__ = QPushButton('Load')
+		self.__button_LoadFile__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
 		self.__button_LoadFile__.clicked.connect(self.onLoadFile)
 
 
