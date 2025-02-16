@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QPushButton, QSpacerItem
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QPushButton, QStatusBar
 from PyQt6.QtCore import Qt
 from PyQt6 import QtWidgets
 
@@ -35,10 +35,10 @@ class MainWindow(QMainWindow):
         leftPanelLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         leftPanelLayout.addWidget(self.componentSerialControl)
         leftPanelLayout.addWidget(self.componentMagAnalyze)
-        leftPanelLayout.addStretch()
-        leftPanelLayout.addWidget(self.componentSelectMode)
+        # leftPanelLayout.addStretch()
+        # leftPanelLayout.addWidget(self.componentSelectMode)
         leftPanelWidget = QWidget()
-        leftPanelWidget.setFixedWidth(450)
+        leftPanelWidget.setFixedWidth(550)
         leftPanelWidget.setLayout(leftPanelLayout)
 
         
@@ -49,15 +49,19 @@ class MainWindow(QMainWindow):
         rightPanelWidgets.setLayout(rightPannelLayout)
 
 
-        myLayout = QHBoxLayout()
-        myLayout.addWidget(leftPanelWidget)
-        myLayout.addWidget(rightPanelWidgets)
-        myWidget = QWidget()
-        myWidget.setLayout(myLayout)
+        mainLayout = QHBoxLayout()
+        mainLayout.addWidget(leftPanelWidget)
+        mainLayout.addWidget(rightPanelWidgets)
+        mainWidget = QWidget()
+        mainWidget.setLayout(mainLayout)
+
+        statusBar = QStatusBar()
+        statusBar.addWidget(self.componentSelectMode)
+        self.setStatusBar(statusBar)
 
 
         self.setWindowTitle("Motion Sensor Tool")
-        self.setCentralWidget(myWidget)
+        self.setCentralWidget(mainWidget)
 
         self.componentSerialControl.registerOnReceivedData(self.DrawData)
 

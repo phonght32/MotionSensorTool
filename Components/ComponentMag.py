@@ -32,6 +32,7 @@ class ComponentMagPlotter(QWidget):
 
         self.pyplotFig2D_axes = self.pyplotFig2D.add_subplot(111)
         self.pyplotFig2D_axes.grid(True)
+        self.pyplotFig2D_axes.set_title("Raw data")
 
         self.pyplotFig3D = plt.figure()
         self.pyplotFig3D.canvas.mpl_connect('motion_notify_event', self.on_move)
@@ -41,12 +42,14 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_RawData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_RawData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_RawData.set_zlabel('MagZ')
+        self.pyplotFig3D_Axes_RawData.set_title("Raw data")
 
         self.pyplotFig3D_Axes_CalibData = self.pyplotFig3D.add_subplot(122, projection='3d')
         self.pyplotFig3D_Axes_CalibData.grid(True)
         self.pyplotFig3D_Axes_CalibData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_CalibData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_CalibData.set_zlabel('MagZ')
+        self.pyplotFig3D_Axes_CalibData.set_title("Calibrated data")
 
 
         # self.pyplotFig3D_Axes_CalibData.shareview(self.pyplotFig3D_Axes_RawData)
@@ -72,6 +75,7 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig2D_axes.plot(Time, RawData_MagZ, label='MagZ')
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.legend()
+        self.pyplotFig2D_axes.set_title("Raw data")
         self.widgetFig2D.draw()
 
         self.pyplotFig3D_Axes_RawData.cla()
@@ -79,6 +83,7 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_RawData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_RawData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_RawData.set_zlabel('MagZ')
+        self.pyplotFig3D_Axes_RawData.set_title("Raw data")
         self.pyplotFig3D_Axes_RawData.scatter(RawData_MagX, RawData_MagY, RawData_MagZ)
         self.pyplotFig3D.canvas.draw_idle()
 
@@ -89,6 +94,7 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_CalibData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_CalibData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_CalibData.set_zlabel('MagZ')
+        self.pyplotFig3D_Axes_CalibData.set_title("Calibrated data")
         self.pyplotFig3D.canvas.draw_idle()
 
     def on_move(self, event):

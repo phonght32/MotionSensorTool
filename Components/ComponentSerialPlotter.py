@@ -20,12 +20,15 @@ class ComponentSerialPlotter(QWidget):
 
         self.pyplotFig2D_axes_accel = self.pyplotFig2D.add_subplot(311)
         self.pyplotFig2D_axes_accel.grid(True)
+        self.pyplotFig2D_axes_accel.set_title("Accelerometer")
 
         self.pyplotFig2D_axes_gyro = self.pyplotFig2D.add_subplot(312, sharex=self.pyplotFig2D_axes_accel)
         self.pyplotFig2D_axes_gyro.grid(True)
+        self.pyplotFig2D_axes_gyro.set_title("Gyroscope")
 
         self.pyplotFig2D_axes_mag = self.pyplotFig2D.add_subplot(313, sharex=self.pyplotFig2D_axes_accel)
         self.pyplotFig2D_axes_mag.grid(True)
+        self.pyplotFig2D_axes_mag.set_title("Magnetometer")
 
         self.__widget_Fig2D__ = FigureCanvasQTAgg(self.pyplotFig2D)
         self.__widget_Toolbar__ = NavigationToolbar2QT(self.__widget_Fig2D__, self)
