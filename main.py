@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
 
 
         leftPanelLayout = QVBoxLayout()
-        leftPanelLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        leftPanelLayout.setContentsMargins(0, 0, 0, 0)
         leftPanelLayout.addWidget(self.componentSerialControl)
         leftPanelLayout.addWidget(self.componentMagAnalyze)
         leftPanelWidget = QWidget()
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         
         rightPannelLayout = QVBoxLayout()
         rightPannelLayout.addWidget(self.componentSerialPlotter)
-        rightPannelLayout.addWidget(self.componentMagPlotter, 1)
+        rightPannelLayout.addWidget(self.componentMagPlotter)
         rightPanelWidgets = QWidget()
         rightPanelWidgets.setLayout(rightPannelLayout)
 

@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QFileDialog
 from PyQt6.QtCore import Qt
 
 from Utils.Singleton import *
@@ -10,7 +10,7 @@ class WidgetSelectFile(QWidget):
 	def __init__(self, onLoadFile=None):
 		super().__init__()
 
-		self.__callbackLoadFile__ = None
+		self.__callbackLoadFile__ = onLoadFile
 		self.__current_FileContent__ = ''
 
 		self.__current_SelectedFilePath__ = 'None'
@@ -26,16 +26,13 @@ class WidgetSelectFile(QWidget):
 		self.__button_LoadFile__.clicked.connect(self.onLoadFile)
 
 
-		layout = QHBoxLayout()
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.addWidget(self.__label_FilePath__)
-		layout.addWidget(self.__label_SelectedFilePath__)
-		layout.addWidget(self.__button_LoadFile__)
-
+		layout = QGridLayout()
+		layout.addWidget(self.__label_FilePath__, 0, 1)
+		layout.addWidget(self.__label_SelectedFilePath__, 0, 2)
+		layout.addWidget(self.__button_LoadFile__, 0, 3)
+        # layout.setContentsMargins(0, 0, 0, 0)
 		self.setLayout(layout)
 
-
-		self.__callbackLoadFile__ = onLoadFile
 
 
 	def onLoadFile(self):
@@ -47,9 +44,6 @@ class WidgetSelectFile(QWidget):
 
 				self.__current_SelectedFilePath__ = filePath
 				self.__label_SelectedFilePath__.setText(os.path.basename(self.__current_SelectedFilePath__))
-
-				# with open(filePath, 'r') as file:
-				# 	self.__current_FileContent__ = file.read()
 
 				if self.__callbackLoadFile__:
 					self.__callbackLoadFile__(self.__current_SelectedFilePath__)

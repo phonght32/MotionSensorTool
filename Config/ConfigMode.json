@@ -1,4 +1,4 @@
 {
-	"enable_serial_plotter": 1,
-	"enable_mag_analyze": 0
+	"enable_serial_plotter": 0,
+	"enable_mag_analyze": 1
 }

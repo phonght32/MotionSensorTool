@@ -37,7 +37,7 @@ class ComponentSelectMode(QWidget):
 		self.groupRadioButton.buttonClicked.connect(self.onChangeMode)
 
 		layout = QHBoxLayout()
-		layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+		# layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 		layout.addWidget(self.radiobutton_SerialPlotter)
 		layout.addWidget(self.radiobutton_AnalyzeMag)
 

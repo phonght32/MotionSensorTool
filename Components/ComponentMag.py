@@ -17,8 +17,8 @@ from Dimension.Dimension import *
 
 
 
-DIMENSION_MATRIX_TYPE = 100
-DIMENSION_MATRIX_VALUE_WIDTH = 80
+DIMENSION_MATRIX_TYPE = 120
+DIMENSION_MATRIX_VALUE_WIDTH = 90
 BORDER_MAXTRIX_VALUE = "border: 1px solid black;"
 
 
@@ -153,11 +153,13 @@ class ComponentMagAnalyze(QWidget):
         
 
         layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.__widget_SelectFile__)
         layout.addWidget(self.__widget_NormOfMagnetic__)
         layout.addWidget(self.__widget_ButtonAction_)
         layout.addWidget(self.__widget_HardIronBias__)
         layout.addWidget(self.__widget_SoftIron__)
+        layout.addStretch()
 
 
         self.setLayout(layout)
@@ -184,16 +186,19 @@ class ComponentMagAnalyze(QWidget):
     
 
     def initWidgetNormOfMagnetic(self):
-        self.__label_NormOfGravity__ = QLabel('Norm of Magnetic or Gravity:')
+        self.__label_NormOfGravity__ = QLabel('Norm of Magnetometer or Gravity: ')
+        self.__label_NormOfGravity__.setFixedWidth(280)
+        # self.__label_NormOfGravity__
 
         self.__input_NormOfMagnetic__ = QLineEdit(self.__current_NormOfGravity__)
         self.__input_NormOfMagnetic__.setFixedWidth(100)
         self.__input_NormOfMagnetic__.textChanged.connect(self.onChangeNormOfMagnetic)
         
-        self.__widget_NormOfMagnetic_Layout__ = QHBoxLayout()
-        self.__widget_NormOfMagnetic_Layout__.setContentsMargins(0, 0, 0, 0)
-        self.__widget_NormOfMagnetic_Layout__.addWidget(self.__label_NormOfGravity__)
-        self.__widget_NormOfMagnetic_Layout__.addWidget(self.__input_NormOfMagnetic__)
+        self.__widget_NormOfMagnetic_Layout__ = QGridLayout()
+        # self.__widget_NormOfMagnetic_Layout__.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # self.__widget_NormOfMagnetic_Layout__.setContentsMargins(0, 0, 0, 0)
+        self.__widget_NormOfMagnetic_Layout__.addWidget(self.__label_NormOfGravity__, 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.__widget_NormOfMagnetic_Layout__.addWidget(self.__input_NormOfMagnetic__, 0, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.__widget_NormOfMagnetic__ = QWidget()
         self.__widget_NormOfMagnetic__.setLayout(self.__widget_NormOfMagnetic_Layout__)
 
@@ -226,7 +231,6 @@ class ComponentMagAnalyze(QWidget):
 
 
         self.__widget_HardIronBias_Layout__ = QHBoxLayout()
-        self.__widget_HardIronBias_Layout__.setContentsMargins(0, 0, 0, 0)
         self.__widget_HardIronBias_Layout__.addWidget(self.__label_HardIronBias__)
         self.__widget_HardIronBias_Layout__.addWidget(self.__label_HardIronBias_b1__)
         self.__widget_HardIronBias_Layout__.addWidget(self.__label_HardIronBias_b2__)
@@ -275,7 +279,7 @@ class ComponentMagAnalyze(QWidget):
         self.__label_SoftIron_m33__.setStyleSheet(BORDER_MAXTRIX_VALUE)
 
         self.__widget_SoftIron_Layout__ = QGridLayout()
-        self.__widget_SoftIron_Layout__.setContentsMargins(0, 0, 0, 0)
+        # self.__widget_SoftIron_Layout__.setContentsMargins(0, 0, 0, 0)
         self.__widget_SoftIron_Layout__.addWidget(self.__label_SoftIron__, 0, 0)
         self.__widget_SoftIron_Layout__.addWidget(self.__label_SoftIron_m11__, 0, 1)
         self.__widget_SoftIron_Layout__.addWidget(self.__label_SoftIron_m12__, 0, 2)
@@ -288,6 +292,7 @@ class ComponentMagAnalyze(QWidget):
         self.__widget_SoftIron_Layout__.addWidget(self.__label_SoftIron_m33__, 2, 3)
 
         self.__widget_SoftIron__ = QWidget()
+        # self.__widget_SoftIron__.setContentsMargins(0, 0, 0, 0)
         self.__widget_SoftIron__.setLayout(self.__widget_SoftIron_Layout__)
 
     def onCalibrate(self):
