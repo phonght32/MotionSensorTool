@@ -62,6 +62,7 @@ class ComponentMagPlotter(QWidget):
         layout.addWidget(self.widgetToolbar)
         layout.addWidget(self.widgetFig2D)
         layout.addWidget(self.widgetFig3D)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
         self.CntDisplay3D = 0

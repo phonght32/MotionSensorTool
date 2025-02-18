@@ -34,6 +34,8 @@ class ComponentSerialPlotter(QWidget):
         self.__widget_Toolbar__ = NavigationToolbar2QT(self.__widget_Fig2D__, self)
 
         layout = QVBoxLayout()
+        
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.__widget_Toolbar__)
         layout.addWidget(self.__widget_Fig2D__)
 
