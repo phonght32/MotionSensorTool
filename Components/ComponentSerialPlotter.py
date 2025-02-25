@@ -44,12 +44,26 @@ class ComponentSerialPlotter(QWidget):
 
         self.setLayout(layout)
 
+
+        self.linesRawAccelX, = self.pyplotFig2D_axes_accel.plot([], [], '-r', label='AccelX')
+        self.linesRawAccelY, = self.pyplotFig2D_axes_accel.plot([], [], '-g', label='AccelY')
+        self.linesRawAccelZ, = self.pyplotFig2D_axes_accel.plot([], [], '-b', label='AccelZ')
+
+        self.linesRawGyroX, = self.pyplotFig2D_axes_gyro.plot([], [], '-r', label='GyroX')
+        self.linesRawGyroY, = self.pyplotFig2D_axes_gyro.plot([], [], '-g', label='GyroY')
+        self.linesRawGyroZ, = self.pyplotFig2D_axes_gyro.plot([], [], '-b', label='GyroZ')
+
         self.linesRawMagX, = self.pyplotFig2D_axes_mag.plot([], [], '-r', label='MagX')
         self.linesRawMagY, = self.pyplotFig2D_axes_mag.plot([], [], '-g', label='MagY')
         self.linesRawMagZ, = self.pyplotFig2D_axes_mag.plot([], [], '-b', label='MagZ')
 
 
-    def plotMagData(self, Time=[], RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
+    def plotAllData(self, 
+        Time=[], 
+        RawData_AccelX=[], RawData_AccelY=[], RawData_AccelZ=[], 
+        RawData_GyroX=[], RawData_GyroY=[], RawData_GyroZ=[], 
+        RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
+
         self.pyplotFig2D_axes_mag.set_title("Magnetometer")
 
 
@@ -63,6 +77,26 @@ class ComponentSerialPlotter(QWidget):
         self.pyplotFig2D_axes_mag.autoscale_view()
         self.pyplotFig2D_axes_mag.legend()
 
+        self.linesRawGyroX.set_ydata(RawData_GyroX)
+        self.linesRawGyroX.set_xdata(Time)
+        self.linesRawGyroY.set_ydata(RawData_GyroY)
+        self.linesRawGyroY.set_xdata(Time)
+        self.linesRawGyroZ.set_ydata(RawData_GyroZ)
+        self.linesRawGyroZ.set_xdata(Time)
+        self.pyplotFig2D_axes_gyro.relim()
+        self.pyplotFig2D_axes_gyro.autoscale_view()
+        self.pyplotFig2D_axes_gyro.legend()
+
+        self.linesRawAccelX.set_ydata(RawData_AccelX)
+        self.linesRawAccelX.set_xdata(Time)
+        self.linesRawAccelY.set_ydata(RawData_AccelY)
+        self.linesRawAccelY.set_xdata(Time)
+        self.linesRawAccelZ.set_ydata(RawData_AccelZ)
+        self.linesRawAccelZ.set_xdata(Time)
+        self.pyplotFig2D_axes_accel.relim()
+        self.pyplotFig2D_axes_accel.autoscale_view()
+        self.pyplotFig2D_axes_accel.legend()
+
         lim_max = Time[-1]
         if lim_max - DISPLAY_INTERVAL > 0:
             lim_min = lim_max - DISPLAY_INTERVAL
@@ -71,4 +105,3 @@ class ComponentSerialPlotter(QWidget):
         self.pyplotFig2D_axes_mag.set_xlim([lim_min, lim_max])
 
         self.__widget_Fig2D__.draw()
-

@@ -18,6 +18,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.time = []
+        self.rawAccelData = np.empty((0,3), int)
+        self.rawGyroData = np.empty((0,3), int)
         self.rawMagData = np.empty((0,3), int)
         self.timeStartMs = 0
 
@@ -72,9 +74,14 @@ class MainWindow(QMainWindow):
         if splitData.size == 9:
             self.time.append(float(timestamp-self.timeStartMs))
 
+            self.rawAccelData = np.append(self.rawAccelData, [[0, 1, 2]], axis=0)
+            self.rawGyroData = np.append(self.rawGyroData, [[0, 1, 2]], axis=0)
             self.rawMagData = np.append(self.rawMagData, [[int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
 
-            ComponentSerialPlotter().plotMagData(self.time, self.rawMagData[:,0], self.rawMagData[:,1], self.rawMagData[:,2])
+            ComponentSerialPlotter().plotAllData(self.time, 
+                self.rawAccelData[:,0], self.rawAccelData[:,1], self.rawAccelData[:,2],
+                self.rawGyroData[:,0], self.rawGyroData[:,1], self.rawGyroData[:,2],
+                self.rawMagData[:,0], self.rawMagData[:,1], self.rawMagData[:,2])
 
 
 app = QApplication(sys.argv)
