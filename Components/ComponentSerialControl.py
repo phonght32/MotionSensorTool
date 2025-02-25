@@ -284,8 +284,9 @@ class ComponentSerialControl(QWidget):
             timestamp = time.time()
             binary_string = self.__current_SerialPort__.readline()
             if binary_string != b'':
-                self.__callback_GetData__(timestamp, binary_string)
-                ComponentConsole().logInfo(str(binary_string, 'utf-8').replace('\r','').replace('\n',''))
+                string_data = str(binary_string, 'utf-8').replace('\r','').replace('\n','')
+                self.__callback_GetData__(timestamp, string_data)
+                ComponentConsole().logInfo(string_data)
 
             
 

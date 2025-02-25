@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.time = []
-        self.rawData = np.empty((0,3), int)
+        self.rawMagData = np.empty((0,3), int)
         self.timeStartMs = 0
 
         self.configModeData = LoadConfigFile()
@@ -68,13 +68,13 @@ class MainWindow(QMainWindow):
     
 
     def DrawData(self, timestamp, binary_string):
-        splitData = re.findall("[+-]?[0-9]+",str(binary_string))
+        splitData = np.array(binary_string.split(','), dtype=int)
+        if splitData.size == 9:
+            self.time.append(float(timestamp-self.timeStartMs))
 
-        if splitData != []:
-            if len(splitData) == 3:
-                self.time.append(float(timestamp-self.timeStartMs))
-                self.rawData = np.append(self.rawData, [[int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
-                ComponentSerialPlotter().plotMagData(self.time, self.rawData[:,0], self.rawData[:,1], self.rawData[:,2])
+            self.rawMagData = np.append(self.rawMagData, [[int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
+
+            ComponentSerialPlotter().plotMagData(self.time, self.rawMagData[:,0], self.rawMagData[:,1], self.rawMagData[:,2])
 
 
 app = QApplication(sys.argv)

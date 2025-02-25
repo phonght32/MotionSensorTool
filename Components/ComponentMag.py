@@ -21,6 +21,10 @@ DIMENSION_MATRIX_TYPE = 120
 DIMENSION_MATRIX_VALUE_WIDTH = 90
 BORDER_MAXTRIX_VALUE = "border: 1px solid black;"
 
+INDEX_MAG_X = 6
+INDEX_MAG_Y = 7
+INDEX_MAG_Z = 8
+
 
 
 @singleton
@@ -177,7 +181,7 @@ class ComponentMagAnalyze(QWidget):
             currentTime += 0.1
 
         self.rawData = data
-        ComponentMagPlotter().plotRawData(Time, self.rawData[:,0], self.rawData[:,1], self.rawData[:,2])
+        ComponentMagPlotter().plotRawData(Time, self.rawData[:,INDEX_MAG_X], self.rawData[:,INDEX_MAG_Y], self.rawData[:,INDEX_MAG_Z])
 
  
 
