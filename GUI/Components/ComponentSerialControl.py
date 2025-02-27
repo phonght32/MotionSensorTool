@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QGridLayout, QPushButton, QLineEdit, QPlainTextEdit, QFileDialog
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6 import QtTest
-from Dimension.Dimension import *
+from GUI.Config.Dimension import *
 from Utils.Singleton import *
 
 

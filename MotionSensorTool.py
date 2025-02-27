@@ -6,12 +6,12 @@ from PyQt6 import QtWidgets
 
 
 from Utils.LoadConfigFile import *
-from Components.ComponentSerialControl import *
-from Components.ComponentSerialPlotter import *
-from Components.ComponentMag import *
-from Components.ComponentConsole import *
+from GUI.Components.ComponentSerialControl import *
+from GUI.Components.ComponentSerialPlotter import *
+from GUI.Components.ComponentMag import *
+from GUI.Components.ComponentConsole import *
 
-from Widgets.WidgetSelectFile import *
+from GUI.Widgets.WidgetSelectFile import *
 
 MODE_IDX_SERIAL_PLOTTER = 0
 MODE_IDX_ANALYZE_MAG = 1

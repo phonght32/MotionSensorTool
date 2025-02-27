@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QLab
 from PyQt6.QtCore import Qt
 
 from Utils.Singleton import *
-from Dimension.Dimension import *
+from GUI.Config.Dimension import *
 
 
 
