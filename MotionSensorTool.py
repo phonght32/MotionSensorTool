@@ -220,7 +220,7 @@ class MainWindow(QMainWindow):
                                                                 int(splitData[3]), int(splitData[4]), int(splitData[5]), 
                                                                 int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
             elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
-                if len(self.__runtime_TimeAllData__) == 0:
+                if len(self.__runtime_TimeMagData__) == 0:
                     self.__runtime_TimeMagData__.append(0)
                     self.__runtime_TimeStartMs__ = time.time()
                 else:
@@ -231,9 +231,9 @@ class MainWindow(QMainWindow):
 
             self.__componentConsole__.logInfo(data[1])
 
-        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and self.__runtime_TimeMagData__ != []:
             ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
-        elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
+        elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and self.__runtime_TimeAllData__ != []:
             ComponentSerialPlotter().plotAllData(self.__runtime_TimeAllData__, 
                 self.__runtime_RawAllData__[:,0], self.__runtime_RawAllData__[:,1], self.__runtime_RawAllData__[:,2],
                 self.__runtime_RawAllData__[:,3], self.__runtime_RawAllData__[:,4], self.__runtime_RawAllData__[:,5],
