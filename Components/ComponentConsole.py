@@ -19,9 +19,7 @@ class CustomeFormatter(logging.Formatter):
 			fmt, color = opt
 			self._style._fmt = \
 			"<font font-family: \"Time New Roman\" color=\"{}\" size=\"2\">\
-				<pre tab-size: 8;>\
-{}\
-				</pre>\
+				<pre tab-size: 8;>{}</pre>\
 			</font>".format(QtGui.QColor(color).name(), fmt)
 
 		res = logging.Formatter.format(self, record)

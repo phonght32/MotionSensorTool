@@ -11,14 +11,12 @@ class WidgetSelectFile(QWidget):
 		super().__init__()
 
 		self.__callbackLoadFile__ = onLoadFile
-		self.__current_FileContent__ = ''
 
-		self.__current_SelectedFilePath__ = 'None'
 
 		self.__label_FilePath__ = QLabel('File:')
 		self.__label_FilePath__.setFixedWidth(DIMENSION_LABEL_WIDTH)
 
-		self.__label_SelectedFilePath__ = QLabel(self.__current_SelectedFilePath__)
+		self.__label_SelectedFilePath__ = QLabel('')
 		self.__label_SelectedFilePath__.setFixedWidth(DIMENSION_COMBOBOX_WIDTH)
 
 		self.__button_LoadFile__ = QPushButton('Load')
@@ -30,7 +28,6 @@ class WidgetSelectFile(QWidget):
 		layout.addWidget(self.__label_FilePath__, 0, 1)
 		layout.addWidget(self.__label_SelectedFilePath__, 0, 2)
 		layout.addWidget(self.__button_LoadFile__, 0, 3)
-        # layout.setContentsMargins(0, 0, 0, 0)
 		self.setLayout(layout)
 
 
@@ -41,10 +38,9 @@ class WidgetSelectFile(QWidget):
 		if dialog.exec():
 			filePath, = dialog.selectedFiles()
 			if filePath:
-
-				self.__current_SelectedFilePath__ = filePath
-				self.__label_SelectedFilePath__.setText(os.path.basename(self.__current_SelectedFilePath__))
-
 				if self.__callbackLoadFile__:
-					self.__callbackLoadFile__(self.__current_SelectedFilePath__)
+					self.__callbackLoadFile__(filePath)
+
+	def setSelectedFileName(self, fileName):
+		self.__label_SelectedFilePath__.setText(fileName)
 

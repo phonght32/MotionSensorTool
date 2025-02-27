@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QLineEdit, QPushButton
 from PyQt6.QtCore import Qt
 
-from Widgets.WidgetSelectFile import *
 from Utils.Singleton import *
 from Dimension.Dimension import *
 
@@ -21,11 +20,8 @@ DIMENSION_MATRIX_TYPE = 120
 DIMENSION_MATRIX_VALUE_WIDTH = 90
 BORDER_MAXTRIX_VALUE = "border: 1px solid black;"
 
-INDEX_MAG_X = 6
-INDEX_MAG_Y = 7
-INDEX_MAG_Z = 8
 
-
+DISPLAY_INTERVAL = 30
 
 @singleton
 class ComponentMagPlotter(QWidget):
@@ -81,6 +77,13 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.legend()
         self.pyplotFig2D_axes.set_title("Raw data")
+
+        lim_max = Time[-1]
+        if lim_max - DISPLAY_INTERVAL > 0:
+            lim_min = lim_max - DISPLAY_INTERVAL
+        else:
+            lim_min = 0
+        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max])
         self.widgetFig2D.draw()
 
         self.pyplotFig3D_Axes_RawData.cla()
@@ -149,7 +152,7 @@ class ComponentMagAnalyze(QWidget):
         self.TimeCalibMag = []
 
 
-        self.__widget_SelectFile__ = WidgetSelectFile(self.onLoadFile)
+       
 
         self.initWidgetNormOfMagnetic()
         self.initWidgetButtonAction()
@@ -159,7 +162,6 @@ class ComponentMagAnalyze(QWidget):
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        layout.addWidget(self.__widget_SelectFile__)
         layout.addWidget(self.__widget_NormOfMagnetic__)
         layout.addWidget(self.__widget_ButtonAction_)
         layout.addWidget(self.__widget_HardIronBias__)
@@ -169,19 +171,7 @@ class ComponentMagAnalyze(QWidget):
 
         self.setLayout(layout)
 
-    def onLoadFile(self, filePath):
-        
-        data = np.loadtxt(filePath, delimiter=',')
-        num_samples = data.shape[0]
-
-        Time = []
-        currentTime = 0.0
-        for idx in range(num_samples):
-            Time.append(currentTime)
-            currentTime += 0.1
-
-        self.rawData = data
-        ComponentMagPlotter().plotRawData(Time, self.rawData[:,INDEX_MAG_X], self.rawData[:,INDEX_MAG_Y], self.rawData[:,INDEX_MAG_Z])
+    
 
  
 
@@ -299,6 +289,9 @@ class ComponentMagAnalyze(QWidget):
         self.__widget_SoftIron__ = QWidget()
         # self.__widget_SoftIron__.setContentsMargins(0, 0, 0, 0)
         self.__widget_SoftIron__.setLayout(self.__widget_SoftIron_Layout__)
+
+    def setRawData(self, data):
+        self.rawData = data
 
     def onCalibrate(self):
 

@@ -9,7 +9,6 @@ import time
 import serial
 import serial.tools.list_ports as prtlst
 
-from Components.ComponentConsole import *
 
 ListBaudrate = [
     '4800',
@@ -134,30 +133,10 @@ class ComponentSerialControl(QWidget):
         self.__combobox_StopBits__.setCurrentIndex(self.__current_StopBitsIdx__)
         self.__combobox_StopBits__.currentIndexChanged.connect(self.onChangeStopBits)
 
-        self.__console__ = ComponentConsole(self)
-        self.__console__.setFormatter(CustomeFormatter())
+        
 
 
-        logging.getLogger().addHandler(self.__console__)
-        logging.getLogger().setLevel(logging.DEBUG)
-        logging.getLogger('matplotlib.font_manager').disabled = True
-
-
-        self.__button_SerialControl_Save__ = QPushButton('Save')
-        self.__button_SerialControl_Save__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
-        self.__button_SerialControl_Save__.clicked.connect(self.onClickSaveConsole)
-
-        self.__button_SerialControl_Clear__ = QPushButton('Clear')
-        self.__button_SerialControl_Clear__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
-        self.__button_SerialControl_Clear__.clicked.connect(self.onClickClearConsole)
-
-        self.__layout_ControlButton__ = QHBoxLayout()
-        self.__layout_ControlButton__.setContentsMargins(0,0,0,0)
-        self.__layout_ControlButton__.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Clear__)
-        self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Save__)
-        self.__widget_ControlButton__ = QWidget()
-        self.__widget_ControlButton__.setLayout(self.__layout_ControlButton__)
+        
 
 
 
@@ -192,32 +171,13 @@ class ComponentSerialControl(QWidget):
 
         layout = QVBoxLayout()
         layout.addWidget(self.__serialSetting_widget__)
-        layout.addWidget(self.__console__.widget)
-        layout.addWidget(self.__widget_ControlButton__)
         self.setLayout(layout)
 
         scanTimer = QTimer(self)
         scanTimer.timeout.connect(self.searchDevCP210x)
         scanTimer.start(500)
 
-    def onClickSaveConsole(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.FileMode.AnyFile)
-        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
-
-        fileName, fileType = dialog.getSaveFileName(self)
-        if fileName:
-            consoleData = ComponentConsole().getCurrentText()
-
-            if '.txt' not in fileName:
-                fileName += '.txt'
-                
-            with open(fileName, 'w') as output:
-                output.write(consoleData)
-
-
-    def onClickClearConsole(self):
-        ComponentConsole().clear()
+    
 
 
     def searchDevCP210x(self):
@@ -266,7 +226,7 @@ class ComponentSerialControl(QWidget):
                 self.__current_SerialPortOpened__ = True
                 self.__timerGetData__ = QTimer(self)
                 self.__timerGetData__.timeout.connect(self.TaskGetData)
-                self.__timerGetData__.start(100)
+                self.__timerGetData__.start(1)
                 print('Connect to {}'.format(self.__current_SelectedDeviceName__))
 
             else:
@@ -281,14 +241,16 @@ class ComponentSerialControl(QWidget):
 
     def TaskGetData(self):
         if self.__callback_GetData__ != None:
-            timestamp = time.time()
-            binary_string = self.__current_SerialPort__.readline()
-            if binary_string != b'':
-                string_data = str(binary_string, 'utf-8').replace('\r','').replace('\n','')
-                self.__callback_GetData__(timestamp, string_data)
-                ComponentConsole().logInfo(string_data)
+            listData = []
+            while self.__current_SerialPort__.in_waiting > 0:
+                timestamp = time.time()
+                string_data = self.__current_SerialPort__.readline().decode('utf-8').strip()
 
-            
+                listData.append([timestamp, string_data])
+
+            if listData != []:
+                self.__callback_GetData__(listData)
+
 
     def registerOnReceivedData(self, callback):
         self.__callback_GetData__ = callback
