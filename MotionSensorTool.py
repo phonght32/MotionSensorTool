@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         self.__runtime_TimeAllData__ = []
         self.__runtime_RawAllData__ = np.empty((0,9), int)
         self.__runtime_RawMagData__ = np.empty((0,3), int)
-        self.timeStartMs = 0
+        self.__runtime_TimeStartMs__ = 0
 
         self.__selectedFile_SerialPlotter__ = ''
         self.__selectedFile_MagAnalyze__ = ''
@@ -132,7 +132,6 @@ class MainWindow(QMainWindow):
 
         self.__componentSerialControl__.registerOnReceivedData(self.DrawData)
 
-        self.timeStartMs = time.time()
 
     def onLoadFile(self, filePath):
 
@@ -211,13 +210,22 @@ class MainWindow(QMainWindow):
         for data in listData:
             splitData = np.array(data[1].split(','), dtype=int)
             if self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and splitData.size == 9:
-                self.__runtime_TimeAllData__.append(float(data[0]-self.timeStartMs))
+                if len(self.__runtime_TimeAllData__) == 0:
+                    self.__runtime_TimeAllData__.append(0)
+                    self.__runtime_TimeStartMs__ = time.time()
+                else:
+                    self.__runtime_TimeAllData__.append(float(data[0]-self.__runtime_TimeStartMs__))
 
                 self.__runtime_RawAllData__ = np.append(self.__runtime_RawAllData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2]), 
                                                                 int(splitData[3]), int(splitData[4]), int(splitData[5]), 
                                                                 int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
             elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
-                self.__runtime_TimeMagData__.append(float(data[0]-self.timeStartMs))
+                if len(self.__runtime_TimeAllData__) == 0:
+                    self.__runtime_TimeMagData__.append(0)
+                    self.__runtime_TimeStartMs__ = time.time()
+                else:
+                    self.__runtime_TimeMagData__.append(float(data[0]-self.__runtime_TimeStartMs__))
+
                 self.__runtime_RawMagData__ = np.append(self.__runtime_RawMagData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
 
 
