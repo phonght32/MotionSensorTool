@@ -34,17 +34,16 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.set_title("Raw data")
 
-        self.pyplotFig3D = plt.figure()
-        self.pyplotFig3D.canvas.mpl_connect('motion_notify_event', self.on_move)
 
-        self.pyplotFig3D_Axes_RawData = self.pyplotFig3D.add_subplot(121, projection='3d')
+        self.pyplotFig3D, (self.pyplotFig3D_Axes_RawData, self.pyplotFig3D_Axes_CalibData) = plt.subplots(1, 2,subplot_kw=dict(projection='3d'))
+        # self.pyplotFig3D.canvas.mpl_connect('motion_notify_event', self.on_move)
+
         self.pyplotFig3D_Axes_RawData.grid(True)
         self.pyplotFig3D_Axes_RawData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_RawData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_RawData.set_zlabel('MagZ')
         self.pyplotFig3D_Axes_RawData.set_title("Raw data")
 
-        self.pyplotFig3D_Axes_CalibData = self.pyplotFig3D.add_subplot(122, projection='3d')
         self.pyplotFig3D_Axes_CalibData.grid(True)
         self.pyplotFig3D_Axes_CalibData.set_xlabel('MagX')
         self.pyplotFig3D_Axes_CalibData.set_ylabel('MagY')
@@ -52,7 +51,6 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_CalibData.set_title("Calibrated data")
 
 
-        # self.pyplotFig3D_Axes_CalibData.shareview(self.pyplotFig3D_Axes_RawData)
 
         self.widgetFig2D = FigureCanvasQTAgg(self.pyplotFig2D)
         self.widgetFig3D = FigureCanvasQTAgg(self.pyplotFig3D)
