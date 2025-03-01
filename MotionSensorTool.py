@@ -130,7 +130,10 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Motion Sensor Tool")
         self.setCentralWidget(mainWidget)
 
-        self.__componentSerialControl__.registerOnReceivedData(self.DrawData)
+        # self.__componentSerialControl__.registerOnReceivedData(self.DrawData)
+        self.__timerDrawData__ = QTimer(self)
+        self.__timerDrawData__.timeout.connect(self.DrawData)
+        self.__timerDrawData__.start(20)
 
 
     def onLoadFile(self, filePath):
@@ -209,39 +212,41 @@ class MainWindow(QMainWindow):
             ComponentSerialPlotter().setVisible(True)
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
 
-    def DrawData(self, listData):
-        for data in listData:
-            splitData = np.array(data[1].split(','), dtype=int)
-            if self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and splitData.size == 9:
-                if len(self.__runtime_TimeAllData__) == 0:
-                    self.__runtime_TimeAllData__.append(0)
-                    self.__runtime_TimeStartMs__ = time.time()
-                else:
-                    self.__runtime_TimeAllData__.append(float(data[0]-self.__runtime_TimeStartMs__))
+    def DrawData(self):
+        if ComponentSerialControl().getConnectStatus() == True:
+            listData = ComponentSerialControl().getSeriaData()
+            for data in listData:
+                splitData = np.array(data[1].split(','), dtype=int)
+                if self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and splitData.size == 9:
+                    if len(self.__runtime_TimeAllData__) == 0:
+                        self.__runtime_TimeAllData__.append(0)
+                        self.__runtime_TimeStartMs__ = time.time()
+                    else:
+                        self.__runtime_TimeAllData__.append(float(data[0]-self.__runtime_TimeStartMs__))
 
-                self.__runtime_RawAllData__ = np.append(self.__runtime_RawAllData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2]), 
-                                                                int(splitData[3]), int(splitData[4]), int(splitData[5]), 
-                                                                int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
-            elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
-                if len(self.__runtime_TimeMagData__) == 0:
-                    self.__runtime_TimeMagData__.append(0)
-                    self.__runtime_TimeStartMs__ = time.time()
-                else:
-                    self.__runtime_TimeMagData__.append(float(data[0]-self.__runtime_TimeStartMs__))
+                    self.__runtime_RawAllData__ = np.append(self.__runtime_RawAllData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2]), 
+                                                                    int(splitData[3]), int(splitData[4]), int(splitData[5]), 
+                                                                    int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
+                elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
+                    if len(self.__runtime_TimeMagData__) == 0:
+                        self.__runtime_TimeMagData__.append(0)
+                        self.__runtime_TimeStartMs__ = time.time()
+                    else:
+                        self.__runtime_TimeMagData__.append(float(data[0]-self.__runtime_TimeStartMs__))
 
-                self.__runtime_RawMagData__ = np.append(self.__runtime_RawMagData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
+                    self.__runtime_RawMagData__ = np.append(self.__runtime_RawMagData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
 
 
-            self.__componentConsole__.logInfo(data[1])
+                self.__componentConsole__.logInfo(data[1])
 
-        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and self.__runtime_TimeMagData__ != []:
-            self.__componentMagAnalyze__.setRawData(self.__runtime_RawMagData__)
-            ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
-        elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and self.__runtime_TimeAllData__ != []:
-            ComponentSerialPlotter().plotAllData(self.__runtime_TimeAllData__, 
-                self.__runtime_RawAllData__[:,0], self.__runtime_RawAllData__[:,1], self.__runtime_RawAllData__[:,2],
-                self.__runtime_RawAllData__[:,3], self.__runtime_RawAllData__[:,4], self.__runtime_RawAllData__[:,5],
-                self.__runtime_RawAllData__[:,6], self.__runtime_RawAllData__[:,7], self.__runtime_RawAllData__[:,8])
+            if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and self.__runtime_TimeMagData__ != []:
+                self.__componentMagAnalyze__.setRawData(self.__runtime_RawMagData__)
+                ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
+            elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and self.__runtime_TimeAllData__ != []:
+                ComponentSerialPlotter().plotAllData(self.__runtime_TimeAllData__, 
+                    self.__runtime_RawAllData__[:,0], self.__runtime_RawAllData__[:,1], self.__runtime_RawAllData__[:,2],
+                    self.__runtime_RawAllData__[:,3], self.__runtime_RawAllData__[:,4], self.__runtime_RawAllData__[:,5],
+                    self.__runtime_RawAllData__[:,6], self.__runtime_RawAllData__[:,7], self.__runtime_RawAllData__[:,8])
 
 
 

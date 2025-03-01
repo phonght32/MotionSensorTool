@@ -71,9 +71,9 @@ class ComponentMagPlotter(QWidget):
     def plotRawData(self, Time=[], RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
 
         self.pyplotFig2D_axes.cla()
-        self.pyplotFig2D_axes.plot(Time, RawData_MagX, label='MagX')
-        self.pyplotFig2D_axes.plot(Time, RawData_MagY, label='MagY')
-        self.pyplotFig2D_axes.plot(Time, RawData_MagZ, label='MagZ')
+        self.pyplotFig2D_axes.plot(Time, RawData_MagX, label='MagX', lw=0.8)
+        self.pyplotFig2D_axes.plot(Time, RawData_MagY, label='MagY', lw=0.8)
+        self.pyplotFig2D_axes.plot(Time, RawData_MagZ, label='MagZ', lw=0.8)
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.legend()
         self.pyplotFig2D_axes.set_title("Raw data")
@@ -83,7 +83,7 @@ class ComponentMagPlotter(QWidget):
             lim_min = lim_max - DISPLAY_INTERVAL
         else:
             lim_min = 0
-        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max])
+        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max+5])
         self.widgetFig2D.draw()
 
         self.pyplotFig3D_Axes_RawData.cla()
@@ -295,7 +295,6 @@ class ComponentMagAnalyze(QWidget):
 
     def onCalibrate(self):
 
-        print(type(self.rawData))
 
         F   = int(self.__current_NormOfGravity__)
         b   = np.zeros([3, 1])

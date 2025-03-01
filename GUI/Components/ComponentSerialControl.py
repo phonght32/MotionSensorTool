@@ -83,6 +83,8 @@ class ComponentSerialControl(QWidget):
         self.__current_ParityIdx__ = 0
         self.__current_StopBitsIdx__ = 0
 
+        self.__current_ListSerialData__ = []
+
         self.__callback_GetData__ = None
 
         self.__label_ComPort__ = QLabel('COM')
@@ -134,12 +136,6 @@ class ComponentSerialControl(QWidget):
         self.__combobox_StopBits__.currentIndexChanged.connect(self.onChangeStopBits)
 
         
-
-
-        
-
-
-
 
         self.__serialSetting_layout__ = QGridLayout()
         self.__serialSetting_layout__.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -240,20 +236,33 @@ class ComponentSerialControl(QWidget):
             print('Disconnect to {}'.format(self.__current_SelectedDeviceName__))
 
     def TaskGetData(self):
-        if self.__callback_GetData__ != None:
-            listData = []
-            while self.__current_SerialPort__.in_waiting > 0:
-                timestamp = time.time()
-                string_data = self.__current_SerialPort__.readline().decode('utf-8').strip()
+        index = 0
+        while self.__current_SerialPort__.in_waiting > 0:
+            
+            timestamp = time.time() + index*0.03
+            index += 1
+            string_data = self.__current_SerialPort__.readline().decode('utf-8')
 
-                listData.append([timestamp, string_data])
-
-            if listData != []:
-                self.__callback_GetData__(listData)
+            self.__current_ListSerialData__.append([timestamp, string_data])
 
 
-    def registerOnReceivedData(self, callback):
-        self.__callback_GetData__ = callback
+    def getSeriaData(self):
+        listData = []
+        while len(self.__current_ListSerialData__) > 0:
+            data = self.__current_ListSerialData__[0]
+            listData.append(data)
+            self.__current_ListSerialData__.pop(0)
+
+
+        return listData
+
+    def getConnectStatus(self):
+        if self.__current_SerialPort__ != None:
+            return self.__current_SerialPort__.isOpen()
+        else:
+            return False
+
+
 
 
     
