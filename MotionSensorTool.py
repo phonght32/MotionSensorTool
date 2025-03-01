@@ -147,6 +147,9 @@ class MainWindow(QMainWindow):
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
             self.__selectedFile_MagAnalyze__ = filePath
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
+
+            self.__runtime_RawMagData__ = np.empty((0,3), int)
+            self.__runtime_TimeMagData__ = []
         
             if data.shape[1] == 3:
                 self.savedTxt_RawMagData = data
@@ -232,6 +235,7 @@ class MainWindow(QMainWindow):
             self.__componentConsole__.logInfo(data[1])
 
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and self.__runtime_TimeMagData__ != []:
+            self.__componentMagAnalyze__.setRawData(self.__runtime_RawMagData__)
             ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
         elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and self.__runtime_TimeAllData__ != []:
             ComponentSerialPlotter().plotAllData(self.__runtime_TimeAllData__, 

@@ -295,6 +295,8 @@ class ComponentMagAnalyze(QWidget):
 
     def onCalibrate(self):
 
+        print(type(self.rawData))
+
         F   = int(self.__current_NormOfGravity__)
         b   = np.zeros([3, 1])
         A_1 = np.eye(3)
