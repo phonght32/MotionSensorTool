@@ -239,11 +239,15 @@ class ComponentSerialControl(QWidget):
         index = 0
         while self.__current_SerialPort__.in_waiting > 0:
             
-            timestamp = time.time() + index*0.03
+            timestamp = time.time()
             index += 1
             string_data = self.__current_SerialPort__.readline().decode('utf-8')
 
             self.__current_ListSerialData__.append([timestamp, string_data])
+
+        if index > 1:
+            for i in range(index):
+                self.__current_ListSerialData__[i][0] -= (index - i - 1)*0.05
 
 
     def getSeriaData(self):
