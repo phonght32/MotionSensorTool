@@ -174,14 +174,15 @@ class MainWindow(QMainWindow):
 
 
     def onLoadFile(self, filePath):
-
         data = np.loadtxt(filePath, delimiter=',')
+
         num_samples = data.shape[0]
 
-        Time = np.empty((0,1), float)
+        Time = np.empty((num_samples,1), float)
         currentTime = 0.0
+
         for idx in range(num_samples):
-            Time = np.append(Time, [[currentTime]], axis=0)
+            Time[idx] = currentTime
             currentTime += 0.1
 
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
