@@ -55,12 +55,15 @@ class MainWindow(QMainWindow):
 
         # Create component IMU data
         self.__componentImuData__ = ComponentImuData()
+        self.__componentImuData__.setVisible(self.__configModeData__['enable_serial_plotter'])
 
         # Create component mag plotter
         self.__componentMagPlotter__ = ComponentMagPlotter()
+        self.__componentMagPlotter__.setVisible(self.__configModeData__['enable_mag_analyze'])
         
         # Create component mag analyzer
         self.__componentMagAnalyze__ = ComponentMagAnalyze()
+        self.__componentMagAnalyze__.setVisible(self.__configModeData__['enable_mag_analyze'])
         
         # Create component select file
         self.__widget_SelectFile__ = WidgetSelectFile(self.onLoadFile)
@@ -72,16 +75,11 @@ class MainWindow(QMainWindow):
         self.__componentConsole__.registerOnClear(self.onClickClearConsole)
 
         
+        # Create radio button for mode selection
         self.radiobutton_AnalyzeMag = QRadioButton('Magnetometer')
         self.radiobutton_AnalyzeMag.setChecked(self.__configModeData__['enable_mag_analyze']) 
-        self.radiobutton_SerialPlotter = QRadioButton('Serial Plotter')
+        self.radiobutton_SerialPlotter = QRadioButton('IMU data')
         self.radiobutton_SerialPlotter.setChecked(self.__configModeData__['enable_serial_plotter']) 
-
-
-        self.__componentMagPlotter__.setVisible(self.__configModeData__['enable_mag_analyze'])
-        self.__componentMagAnalyze__.setVisible(self.__configModeData__['enable_mag_analyze'])
-        self.__componentImuData__.setVisible(self.__configModeData__['enable_serial_plotter'])
-
 
         self.groupRadioButton = QButtonGroup(self)
         self.groupRadioButton.addButton(self.radiobutton_SerialPlotter, MODE_IDX_SERIAL_PLOTTER)
@@ -95,13 +93,13 @@ class MainWindow(QMainWindow):
         self.__componentSelectMode__.setLayout(self.groupRadioButtonLayout)
 
 
-
-
+        # Handle logging module
         logging.getLogger().addHandler(self.__componentConsole__)
         logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger('matplotlib.font_manager').disabled = True
 
 
+        # Create left panel
         leftPanelLayout = QVBoxLayout()
         leftPanelLayout.setContentsMargins(0, 0, 0, 0)
         leftPanelLayout.addWidget(self.__componentSerialControl__)
@@ -112,20 +110,21 @@ class MainWindow(QMainWindow):
         leftPanelWidget.setFixedWidth(480)
         leftPanelWidget.setLayout(leftPanelLayout)
 
-        
+        # Create right panel
         rightPannelLayout = QVBoxLayout()
         rightPannelLayout.addWidget(self.__componentImuData__)
         rightPannelLayout.addWidget(self.__componentMagPlotter__)
         rightPanelWidgets = QWidget()
         rightPanelWidgets.setLayout(rightPannelLayout)
 
-
+        # Create main window
         mainLayout = QHBoxLayout()
         mainLayout.addWidget(leftPanelWidget)
         mainLayout.addWidget(rightPanelWidgets)
         mainWidget = QWidget()
         mainWidget.setLayout(mainLayout)
 
+        # Create status bar
         statusBar = QStatusBar()
         statusBar.addWidget(self.__componentSelectMode__)
         self.setStatusBar(statusBar)
@@ -134,7 +133,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Motion Sensor Tool")
         self.setCentralWidget(mainWidget)
 
-        # self.__componentSerialControl__.registerOnReceivedData(self.DrawData)
+        # Create timer to get data from serial
         self.__timerDrawData__ = QTimer(self)
         self.__timerDrawData__.timeout.connect(self.DrawData)
         self.__timerDrawData__.start(20)
