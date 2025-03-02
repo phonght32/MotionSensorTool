@@ -138,6 +138,40 @@ class MainWindow(QMainWindow):
         self.__timerDrawData__.timeout.connect(self.DrawData)
         self.__timerDrawData__.start(20)
 
+    def onChangeMode(self, object):
+        self.__currentModeIdx__ = self.groupRadioButton.id(object)
+
+        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+            ComponentMagPlotter().setVisible(True)
+            ComponentMagAnalyze().setVisible(True)
+            ComponentImuData().setVisible(False)
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
+        elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
+            ComponentMagPlotter().setVisible(False)
+            ComponentMagAnalyze().setVisible(False)
+            ComponentImuData().setVisible(True)
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
+
+
+    def onClickSaveConsole(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.FileMode.AnyFile)
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+
+        fileName, fileType = dialog.getSaveFileName(self)
+        if fileName:
+            consoleData = self.__componentConsole__.getCurrentText()
+
+            if '.txt' not in fileName:
+                fileName += '.txt'
+                
+            with open(fileName, 'w') as output:
+                output.write(consoleData)
+
+
+    def onClickClearConsole(self):
+        self.__componentConsole__.clear()
+
 
     def onLoadFile(self, filePath):
 
@@ -175,40 +209,6 @@ class MainWindow(QMainWindow):
             else:
                 print('Incorrect all data format')
 
-
-        
-    def onClickSaveConsole(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.FileMode.AnyFile)
-        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
-
-        fileName, fileType = dialog.getSaveFileName(self)
-        if fileName:
-            consoleData = self.__componentConsole__.getCurrentText()
-
-            if '.txt' not in fileName:
-                fileName += '.txt'
-                
-            with open(fileName, 'w') as output:
-                output.write(consoleData)
-
-
-    def onClickClearConsole(self):
-        self.__componentConsole__.clear()
-
-    def onChangeMode(self, object):
-        self.__currentModeIdx__ = self.groupRadioButton.id(object)
-
-        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
-            ComponentMagPlotter().setVisible(True)
-            ComponentMagAnalyze().setVisible(True)
-            ComponentImuData().setVisible(False)
-            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
-        elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
-            ComponentMagPlotter().setVisible(False)
-            ComponentMagAnalyze().setVisible(False)
-            ComponentImuData().setVisible(True)
-            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
 
     def DrawData(self):
         if ComponentSerialControl().getConnectStatus() == True:
