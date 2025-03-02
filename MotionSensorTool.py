@@ -7,7 +7,7 @@ from PyQt6 import QtWidgets
 
 from Utils.LoadConfigFile import *
 from GUI.Components.ComponentSerialControl import *
-from GUI.Components.ComponentSerialPlotter import *
+from GUI.Components.ComponentImuData import *
 from GUI.Components.ComponentMag import *
 from GUI.Components.ComponentConsole import *
 
@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
             self.__currentModeIdx__ = MODE_IDX_ANALYZE_MAG
 
         self.__componentSerialControl__ = ComponentSerialControl()
-        self.__componentSerialPlotter__ = ComponentSerialPlotter()
+        self.__componentImuData__ = ComponentImuData()
         self.__componentMagPlotter__ = ComponentMagPlotter()
         self.__componentMagAnalyze__ = ComponentMagAnalyze()
         self.__widget_SelectFile__ = WidgetSelectFile(self.onLoadFile)
@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
 
         self.__componentMagPlotter__.setVisible(self.configModeData['enable_mag_analyze'])
         self.__componentMagAnalyze__.setVisible(self.configModeData['enable_mag_analyze'])
-        self.__componentSerialPlotter__.setVisible(self.configModeData['enable_serial_plotter'])
+        self.__componentImuData__.setVisible(self.configModeData['enable_serial_plotter'])
 
 
         self.groupRadioButton = QButtonGroup(self)
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
 
         
         rightPannelLayout = QVBoxLayout()
-        rightPannelLayout.addWidget(self.__componentSerialPlotter__)
+        rightPannelLayout.addWidget(self.__componentImuData__)
         rightPannelLayout.addWidget(self.__componentMagPlotter__)
         rightPanelWidgets = QWidget()
         rightPanelWidgets.setLayout(rightPannelLayout)
@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
 
             if data.shape[1] == 9:
                 self.saveTxt_RawAccelGyroMagData = data
-                ComponentSerialPlotter().plotAllData(Time, 
+                ComponentImuData().plotAllData(Time, 
                                                     data[:,0], data[:,1], data[:,2],
                                                     data[:,3], data[:,4], data[:,5],
                                                     data[:,6], data[:,7], data[:,8])
@@ -204,12 +204,12 @@ class MainWindow(QMainWindow):
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
             ComponentMagPlotter().setVisible(True)
             ComponentMagAnalyze().setVisible(True)
-            ComponentSerialPlotter().setVisible(False)
+            ComponentImuData().setVisible(False)
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
         elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
             ComponentMagPlotter().setVisible(False)
             ComponentMagAnalyze().setVisible(False)
-            ComponentSerialPlotter().setVisible(True)
+            ComponentImuData().setVisible(True)
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
 
     def DrawData(self):
@@ -243,7 +243,7 @@ class MainWindow(QMainWindow):
                 self.__componentMagAnalyze__.setRawData(self.__runtime_RawMagData__)
                 ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
             elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and self.__runtime_TimeAllData__ != []:
-                ComponentSerialPlotter().plotAllData(self.__runtime_TimeAllData__, 
+                ComponentImuData().plotAllData(self.__runtime_TimeAllData__, 
                     self.__runtime_RawAllData__[:,0], self.__runtime_RawAllData__[:,1], self.__runtime_RawAllData__[:,2],
                     self.__runtime_RawAllData__[:,3], self.__runtime_RawAllData__[:,4], self.__runtime_RawAllData__[:,5],
                     self.__runtime_RawAllData__[:,6], self.__runtime_RawAllData__[:,7], self.__runtime_RawAllData__[:,8])

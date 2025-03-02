@@ -13,7 +13,7 @@ LINE_WIDTH = 1
 
 
 @singleton
-class ComponentSerialPlotter(QWidget):
+class ComponentImuData(QWidget):
     def __init__(self):
         super().__init__()
 
