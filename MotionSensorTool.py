@@ -26,21 +26,28 @@ class MainWindow(QMainWindow):
         # Numpy array contains IMU data and timestamp: [timestamp, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z]
         self.__runtime_ImuData__ = np.empty((0,10), int)
 
+        # Numpy array contains saved IMU data from .txt file
+        self.__savedTxt_ImuData__ = np.empty((0,10), int)
+
         # Numpy array contains magnetometer data and timestamp: [timestamp, mag_x, mag_y, mag_z]
         self.__runtime_MagData__ = np.empty((0,4), int)
+
+        # Numpy array contains saved mag data from .txt file
+        self.__savedTxt_MagData__ = np.empty((0,4), int)
 
         # Time point when start monitor data
         self.__runtime_TimeStartMs__ = 0
 
+        # Current selected files
         self.__selectedFile_SerialPlotter__ = ''
         self.__selectedFile_MagAnalyze__ = ''
 
-        self.configModeData = LoadConfigFile()
+        self.__configModeData__ = LoadConfigFile()
 
         # Get current mode display [IMU data, magnetometer]
-        if self.configModeData['enable_serial_plotter'] == 1:
+        if self.__configModeData__['enable_serial_plotter'] == 1:
             self.__currentModeIdx__ = MODE_IDX_SERIAL_PLOTTER
-        elif self.configModeData['enable_mag_analyze'] == 1:
+        elif self.__configModeData__['enable_mag_analyze'] == 1:
             self.__currentModeIdx__ = MODE_IDX_ANALYZE_MAG
 
         # Create component serial control 
@@ -80,14 +87,14 @@ class MainWindow(QMainWindow):
 
 
         self.radiobutton_AnalyzeMag = QRadioButton('Magnetometer')
-        self.radiobutton_AnalyzeMag.setChecked(self.configModeData['enable_mag_analyze']) 
+        self.radiobutton_AnalyzeMag.setChecked(self.__configModeData__['enable_mag_analyze']) 
         self.radiobutton_SerialPlotter = QRadioButton('Serial Plotter')
-        self.radiobutton_SerialPlotter.setChecked(self.configModeData['enable_serial_plotter']) 
+        self.radiobutton_SerialPlotter.setChecked(self.__configModeData__['enable_serial_plotter']) 
 
 
-        self.__componentMagPlotter__.setVisible(self.configModeData['enable_mag_analyze'])
-        self.__componentMagAnalyze__.setVisible(self.configModeData['enable_mag_analyze'])
-        self.__componentImuData__.setVisible(self.configModeData['enable_serial_plotter'])
+        self.__componentMagPlotter__.setVisible(self.__configModeData__['enable_mag_analyze'])
+        self.__componentMagAnalyze__.setVisible(self.__configModeData__['enable_mag_analyze'])
+        self.__componentImuData__.setVisible(self.__configModeData__['enable_serial_plotter'])
 
 
         self.groupRadioButton = QButtonGroup(self)
@@ -166,9 +173,9 @@ class MainWindow(QMainWindow):
             self.__runtime_MagData__ = np.empty((0,4), int)
         
             if data.shape[1] == 3:
-                self.savedTxt_RawMagData = np.concatenate((Time, data), axis=1)
+                self.__savedTxt_MagData__ = np.concatenate((Time, data), axis=1)
                 self.__componentMagAnalyze__.setRawData(data)
-                ComponentMagPlotter().plot(self.savedTxt_RawMagData)
+                ComponentMagPlotter().plot(self.__savedTxt_MagData__)
             else:
                 print('Incorrect mag data format')
 
@@ -179,8 +186,8 @@ class MainWindow(QMainWindow):
             self.__runtime_ImuData__ = np.empty((0,10), int)
 
             if data.shape[1] == 9:
-                self.savedTxt_RawAccelGyroMagData = np.concatenate((Time, data), axis=1)
-                ComponentImuData().plot(self.savedTxt_RawAccelGyroMagData)
+                self.__savedTxt_ImuData__ = np.concatenate((Time, data), axis=1)
+                ComponentImuData().plot(self.__savedTxt_ImuData__)
             else:
                 print('Incorrect all data format')
 
