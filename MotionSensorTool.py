@@ -22,9 +22,14 @@ MODE_IDX_ANALYZE_MAG = 1
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.__runtime_TimeMagData__ = []
+
+        # Numpy array contains IMU data and timestamp: [timestamp, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z]
         self.__runtime_ImuData__ = np.empty((0,10), int)
-        self.__runtime_RawMagData__ = np.empty((0,3), int)
+
+        # Numpy array contains magnetometer data and timestamp: [timestamp, mag_x, mag_y, mag_z]
+        self.__runtime_MagData__ = np.empty((0,4), int)
+
+        # Time point when start monitor data
         self.__runtime_TimeStartMs__ = 0
 
         self.__selectedFile_SerialPlotter__ = ''
@@ -72,7 +77,6 @@ class MainWindow(QMainWindow):
         self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Save__)
         self.__widget_ControlButton__ = QWidget()
         self.__widget_ControlButton__.setLayout(self.__layout_ControlButton__)
-
 
 
         self.radiobutton_AnalyzeMag = QRadioButton('Magnetometer')
@@ -159,13 +163,12 @@ class MainWindow(QMainWindow):
             self.__selectedFile_MagAnalyze__ = filePath
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
 
-            self.__runtime_RawMagData__ = np.empty((0,3), int)
-            self.__runtime_TimeMagData__ = []
+            self.__runtime_MagData__ = np.empty((0,4), int)
         
             if data.shape[1] == 3:
-                self.savedTxt_RawMagData = data
+                self.savedTxt_RawMagData = np.concatenate((Time, data), axis=1)
                 self.__componentMagAnalyze__.setRawData(data)
-                ComponentMagPlotter().plotRawData(Time, data[:,0], data[:,1], data[:,2])
+                ComponentMagPlotter().plot(self.savedTxt_RawMagData)
             else:
                 print('Incorrect mag data format')
 
@@ -233,20 +236,20 @@ class MainWindow(QMainWindow):
                                                                     int(splitData[3]), int(splitData[4]), int(splitData[5]), 
                                                                     int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
                 elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
-                    if len(self.__runtime_TimeMagData__) == 0:
-                        self.__runtime_TimeMagData__.append(0)
+                    if len(self.__runtime_MagData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
+                        timestamp = 0.0
                     else:
-                        self.__runtime_TimeMagData__.append(float(data[0]-self.__runtime_TimeStartMs__))
+                        timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_RawMagData__ = np.append(self.__runtime_RawMagData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
+                    self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
 
 
                 self.__componentConsole__.logInfo(data[1])
 
-            if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and self.__runtime_TimeMagData__ != []:
-                self.__componentMagAnalyze__.setRawData(self.__runtime_RawMagData__)
-                ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
+            if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+                self.__componentMagAnalyze__.setRawData(self.__runtime_MagData__[:,[1,2,3]])
+                ComponentMagPlotter().plot(self.__runtime_MagData__)
             elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
                 ComponentImuData().plot(self.__runtime_ImuData__)
 

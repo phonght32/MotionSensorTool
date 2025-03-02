@@ -36,7 +36,7 @@ class ComponentMagPlotter(QWidget):
 
 
         self.pyplotFig3D, (self.pyplotFig3D_Axes_RawData, self.pyplotFig3D_Axes_CalibData) = plt.subplots(1, 2,subplot_kw=dict(projection='3d'))
-        # self.pyplotFig3D.canvas.mpl_connect('motion_notify_event', self.on_move)
+        self.pyplotFig3D.canvas.mpl_connect('motion_notify_event', self.on_move)
 
         self.pyplotFig3D_Axes_RawData.grid(True)
         self.pyplotFig3D_Axes_RawData.set_xlabel('MagX')
@@ -49,7 +49,6 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_CalibData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_CalibData.set_zlabel('MagZ')
         self.pyplotFig3D_Axes_CalibData.set_title("Calibrated data")
-
 
 
         self.widgetFig2D = FigureCanvasQTAgg(self.pyplotFig2D)
@@ -66,12 +65,16 @@ class ComponentMagPlotter(QWidget):
         self.CntDisplay3D = 0
 
         
-    def plotRawData(self, Time=[], RawData_MagX=[], RawData_MagY=[], RawData_MagZ=[]):
+    def plot(self, MagData):
+        Time = MagData[:,0]
+        MagX = MagData[:,1]
+        MagY = MagData[:,2]
+        MagZ = MagData[:,3]
 
         self.pyplotFig2D_axes.cla()
-        self.pyplotFig2D_axes.plot(Time, RawData_MagX, label='MagX', lw=0.8)
-        self.pyplotFig2D_axes.plot(Time, RawData_MagY, label='MagY', lw=0.8)
-        self.pyplotFig2D_axes.plot(Time, RawData_MagZ, label='MagZ', lw=0.8)
+        self.pyplotFig2D_axes.plot(Time, MagX, label='MagX', lw=0.8)
+        self.pyplotFig2D_axes.plot(Time, MagY, label='MagY', lw=0.8)
+        self.pyplotFig2D_axes.plot(Time, MagZ, label='MagZ', lw=0.8)
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.legend()
         self.pyplotFig2D_axes.set_title("Raw data")
@@ -90,7 +93,7 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_RawData.set_ylabel('MagY')
         self.pyplotFig3D_Axes_RawData.set_zlabel('MagZ')
         self.pyplotFig3D_Axes_RawData.set_title("Raw data")
-        self.pyplotFig3D_Axes_RawData.scatter(RawData_MagX, RawData_MagY, RawData_MagZ)
+        self.pyplotFig3D_Axes_RawData.scatter(MagX, MagY, MagZ)
         self.pyplotFig3D.canvas.draw_idle()
 
     def plotCalibData(self, Time=[], CalibData_MagX=[], CalibData_MagY=[], CalibData_MagZ=[]):
