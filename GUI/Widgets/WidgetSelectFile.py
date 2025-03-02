@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QFileDial
 from PyQt6.QtCore import Qt
 
 from Utils.Singleton import *
-from GUI.Config.Dimension import *
+from GUI.Config.Config_Widget import *
 
 import os
 

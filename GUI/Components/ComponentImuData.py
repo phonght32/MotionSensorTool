@@ -8,8 +8,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QComboBox
 from PyQt6.QtCore import Qt
 from Utils.Singleton import *
 
-DISPLAY_INTERVAL = 30
-LINE_WIDTH = 1
+from GUI.Config.Config_Widget import *
 
 
 @singleton
@@ -32,17 +31,17 @@ class ComponentImuData(QWidget):
         self.pyplotFig2D_axes_mag.set_title("Magnetometer")
 
         # Create lines
-        self.linesRawAccelX, = self.pyplotFig2D_axes_accel.plot([], [], '-r', label='AccelX', lw=LINE_WIDTH)
-        self.linesRawAccelY, = self.pyplotFig2D_axes_accel.plot([], [], '-g', label='AccelY', lw=LINE_WIDTH)
-        self.linesRawAccelZ, = self.pyplotFig2D_axes_accel.plot([], [], '-b', label='AccelZ', lw=LINE_WIDTH)
+        self.linesRawAccelX, = self.pyplotFig2D_axes_accel.plot([], [], '-r', label='AccelX', lw=FIGURE_LINE_WIDTH)
+        self.linesRawAccelY, = self.pyplotFig2D_axes_accel.plot([], [], '-g', label='AccelY', lw=FIGURE_LINE_WIDTH)
+        self.linesRawAccelZ, = self.pyplotFig2D_axes_accel.plot([], [], '-b', label='AccelZ', lw=FIGURE_LINE_WIDTH)
 
-        self.linesRawGyroX, = self.pyplotFig2D_axes_gyro.plot([], [], '-r', label='GyroX', lw=LINE_WIDTH)
-        self.linesRawGyroY, = self.pyplotFig2D_axes_gyro.plot([], [], '-g', label='GyroY', lw=LINE_WIDTH)
-        self.linesRawGyroZ, = self.pyplotFig2D_axes_gyro.plot([], [], '-b', label='GyroZ', lw=LINE_WIDTH)
+        self.linesRawGyroX, = self.pyplotFig2D_axes_gyro.plot([], [], '-r', label='GyroX', lw=FIGURE_LINE_WIDTH)
+        self.linesRawGyroY, = self.pyplotFig2D_axes_gyro.plot([], [], '-g', label='GyroY', lw=FIGURE_LINE_WIDTH)
+        self.linesRawGyroZ, = self.pyplotFig2D_axes_gyro.plot([], [], '-b', label='GyroZ', lw=FIGURE_LINE_WIDTH)
 
-        self.linesRawMagX, = self.pyplotFig2D_axes_mag.plot([], [], '-r', label='MagX', lw=LINE_WIDTH)
-        self.linesRawMagY, = self.pyplotFig2D_axes_mag.plot([], [], '-g', label='MagY', lw=LINE_WIDTH)
-        self.linesRawMagZ, = self.pyplotFig2D_axes_mag.plot([], [], '-b', label='MagZ', lw=LINE_WIDTH)
+        self.linesRawMagX, = self.pyplotFig2D_axes_mag.plot([], [], '-r', label='MagX', lw=FIGURE_LINE_WIDTH)
+        self.linesRawMagY, = self.pyplotFig2D_axes_mag.plot([], [], '-g', label='MagY', lw=FIGURE_LINE_WIDTH)
+        self.linesRawMagZ, = self.pyplotFig2D_axes_mag.plot([], [], '-b', label='MagZ', lw=FIGURE_LINE_WIDTH)
 
 
         # Configure Qt canvas and toolbar
@@ -104,10 +103,10 @@ class ComponentImuData(QWidget):
         self.pyplotFig2D_axes_mag.set_title("Magnetometer")
 
         lim_max = Time[-1]
-        if lim_max - DISPLAY_INTERVAL > 0:
-            lim_min = lim_max - DISPLAY_INTERVAL
+        if lim_max - FIGURE_DISPLAY_INTERVAL > 0:
+            lim_min = lim_max - FIGURE_DISPLAY_INTERVAL
         else:
             lim_min = 0
-        self.pyplotFig2D_axes_mag.set_xlim([lim_min, lim_max])
+        self.pyplotFig2D_axes_mag.set_xlim([lim_min, lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION])
 
         self.__widget_Fig2D__.draw()

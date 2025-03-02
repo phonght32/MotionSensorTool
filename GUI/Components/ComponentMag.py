@@ -12,16 +12,13 @@ from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QLab
 from PyQt6.QtCore import Qt
 
 from Utils.Singleton import *
-from GUI.Config.Dimension import *
+from GUI.Config.Config_Widget import *
 
 
 
 DIMENSION_MATRIX_TYPE = 120
 DIMENSION_MATRIX_VALUE_WIDTH = 90
 BORDER_MAXTRIX_VALUE = "border: 1px solid black;"
-
-
-DISPLAY_INTERVAL = 30
 
 @singleton
 class ComponentMagPlotter(QWidget):
@@ -72,19 +69,19 @@ class ComponentMagPlotter(QWidget):
         MagZ = MagData[:,3]
 
         self.pyplotFig2D_axes.cla()
-        self.pyplotFig2D_axes.plot(Time, MagX, label='MagX', lw=0.8)
-        self.pyplotFig2D_axes.plot(Time, MagY, label='MagY', lw=0.8)
-        self.pyplotFig2D_axes.plot(Time, MagZ, label='MagZ', lw=0.8)
+        self.pyplotFig2D_axes.plot(Time, MagX, label='MagX', lw=FIGURE_LINE_WIDTH)
+        self.pyplotFig2D_axes.plot(Time, MagY, label='MagY', lw=FIGURE_LINE_WIDTH)
+        self.pyplotFig2D_axes.plot(Time, MagZ, label='MagZ', lw=FIGURE_LINE_WIDTH)
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.legend()
         self.pyplotFig2D_axes.set_title("Raw data")
 
         lim_max = Time[-1]
-        if lim_max - DISPLAY_INTERVAL > 0:
-            lim_min = lim_max - DISPLAY_INTERVAL
+        if lim_max - FIGURE_DISPLAY_INTERVAL > 0:
+            lim_min = lim_max - FIGURE_DISPLAY_INTERVAL
         else:
             lim_min = 0
-        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max+5])
+        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION])
         self.widgetFig2D.draw()
 
         self.pyplotFig3D_Axes_RawData.cla()
