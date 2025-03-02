@@ -23,8 +23,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.__runtime_TimeMagData__ = []
-        self.__runtime_TimeAllData__ = []
-        self.__runtime_RawAllData__ = np.empty((0,9), int)
+        self.__runtime_RawAllData__ = np.empty((0,10), int)
         self.__runtime_RawMagData__ = np.empty((0,3), int)
         self.__runtime_TimeStartMs__ = 0
 
@@ -33,18 +32,28 @@ class MainWindow(QMainWindow):
 
         self.configModeData = LoadConfigFile()
 
+        # Get current mode display [IMU data, magnetometer]
         if self.configModeData['enable_serial_plotter'] == 1:
             self.__currentModeIdx__ = MODE_IDX_SERIAL_PLOTTER
         elif self.configModeData['enable_mag_analyze'] == 1:
             self.__currentModeIdx__ = MODE_IDX_ANALYZE_MAG
 
+        # Create component serial control 
         self.__componentSerialControl__ = ComponentSerialControl()
+
+        # Create component IMU data
         self.__componentImuData__ = ComponentImuData()
+
+        # Create component mag plotter
         self.__componentMagPlotter__ = ComponentMagPlotter()
+        
+        # Create component mag analyzer
         self.__componentMagAnalyze__ = ComponentMagAnalyze()
+        
+        # Create component select file
         self.__widget_SelectFile__ = WidgetSelectFile(self.onLoadFile)
-
-
+        
+        # Create component console
         self.__componentConsole__ = ComponentConsole(self)
         self.__componentConsole__.setFormatter(CustomeFormatter())
 
@@ -63,7 +72,6 @@ class MainWindow(QMainWindow):
         self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Save__)
         self.__widget_ControlButton__ = QWidget()
         self.__widget_ControlButton__.setLayout(self.__layout_ControlButton__)
-
 
 
 
@@ -141,10 +149,10 @@ class MainWindow(QMainWindow):
         data = np.loadtxt(filePath, delimiter=',')
         num_samples = data.shape[0]
 
-        Time = []
+        Time = np.empty((0,1), float)
         currentTime = 0.0
         for idx in range(num_samples):
-            Time.append(currentTime)
+            Time = np.append(Time, [[currentTime]], axis=0)
             currentTime += 0.1
 
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
@@ -165,15 +173,11 @@ class MainWindow(QMainWindow):
             self.__selectedFile_SerialPlotter__ = filePath
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
 
-            self.__runtime_RawAllData__ = np.empty((0,9), int)
-            self.__runtime_TimeAllData__ = []
+            self.__runtime_RawAllData__ = np.empty((0,10), int)
 
             if data.shape[1] == 9:
-                self.saveTxt_RawAccelGyroMagData = data
-                ComponentImuData().plotAllData(Time, 
-                                                    data[:,0], data[:,1], data[:,2],
-                                                    data[:,3], data[:,4], data[:,5],
-                                                    data[:,6], data[:,7], data[:,8])
+                self.savedTxt_RawAccelGyroMagData = np.concatenate((Time, data), axis=1)
+                ComponentImuData().plot(self.savedTxt_RawAccelGyroMagData)
             else:
                 print('Incorrect all data format')
 
@@ -218,13 +222,14 @@ class MainWindow(QMainWindow):
             for data in listData:
                 splitData = np.array(data[1].split(','), dtype=int)
                 if self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and splitData.size == 9:
-                    if len(self.__runtime_TimeAllData__) == 0:
-                        self.__runtime_TimeAllData__.append(0)
+                    if len(self.__runtime_RawAllData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
+                        timestamp = 0.0
                     else:
-                        self.__runtime_TimeAllData__.append(float(data[0]-self.__runtime_TimeStartMs__))
+                        timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_RawAllData__ = np.append(self.__runtime_RawAllData__, [[int(splitData[0]), int(splitData[1]), int(splitData[2]), 
+                    self.__runtime_RawAllData__ = np.append(self.__runtime_RawAllData__, [[timestamp,
+                                                                    int(splitData[0]), int(splitData[1]), int(splitData[2]), 
                                                                     int(splitData[3]), int(splitData[4]), int(splitData[5]), 
                                                                     int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
                 elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
@@ -242,11 +247,8 @@ class MainWindow(QMainWindow):
             if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and self.__runtime_TimeMagData__ != []:
                 self.__componentMagAnalyze__.setRawData(self.__runtime_RawMagData__)
                 ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
-            elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and self.__runtime_TimeAllData__ != []:
-                ComponentImuData().plotAllData(self.__runtime_TimeAllData__, 
-                    self.__runtime_RawAllData__[:,0], self.__runtime_RawAllData__[:,1], self.__runtime_RawAllData__[:,2],
-                    self.__runtime_RawAllData__[:,3], self.__runtime_RawAllData__[:,4], self.__runtime_RawAllData__[:,5],
-                    self.__runtime_RawAllData__[:,6], self.__runtime_RawAllData__[:,7], self.__runtime_RawAllData__[:,8])
+            elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
+                ComponentImuData().plot(self.__runtime_RawAllData__)
 
 
 
