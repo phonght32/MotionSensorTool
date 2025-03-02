@@ -23,7 +23,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.__runtime_TimeMagData__ = []
-        self.__runtime_RawAllData__ = np.empty((0,10), int)
+        self.__runtime_ImuData__ = np.empty((0,10), int)
         self.__runtime_RawMagData__ = np.empty((0,3), int)
         self.__runtime_TimeStartMs__ = 0
 
@@ -173,7 +173,7 @@ class MainWindow(QMainWindow):
             self.__selectedFile_SerialPlotter__ = filePath
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
 
-            self.__runtime_RawAllData__ = np.empty((0,10), int)
+            self.__runtime_ImuData__ = np.empty((0,10), int)
 
             if data.shape[1] == 9:
                 self.savedTxt_RawAccelGyroMagData = np.concatenate((Time, data), axis=1)
@@ -222,13 +222,13 @@ class MainWindow(QMainWindow):
             for data in listData:
                 splitData = np.array(data[1].split(','), dtype=int)
                 if self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and splitData.size == 9:
-                    if len(self.__runtime_RawAllData__) == 0:
+                    if len(self.__runtime_ImuData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
                         timestamp = 0.0
                     else:
                         timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_RawAllData__ = np.append(self.__runtime_RawAllData__, [[timestamp,
+                    self.__runtime_ImuData__ = np.append(self.__runtime_ImuData__, [[timestamp,
                                                                     int(splitData[0]), int(splitData[1]), int(splitData[2]), 
                                                                     int(splitData[3]), int(splitData[4]), int(splitData[5]), 
                                                                     int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
                 self.__componentMagAnalyze__.setRawData(self.__runtime_RawMagData__)
                 ComponentMagPlotter().plotRawData(self.__runtime_TimeMagData__, self.__runtime_RawMagData__[:,0], self.__runtime_RawMagData__[:,1], self.__runtime_RawMagData__[:,2])
             elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
-                ComponentImuData().plot(self.__runtime_RawAllData__)
+                ComponentImuData().plot(self.__runtime_ImuData__)
 
 
 
