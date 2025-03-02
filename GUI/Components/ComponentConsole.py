@@ -1,7 +1,10 @@
 import logging
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QWidget, QPlainTextEdit
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QPushButton, QHBoxLayout
 from Utils.Singleton import *
+
+from GUI.Config.Config_Widget import *
 
 
 class CustomeFormatter(logging.Formatter):
@@ -31,20 +34,67 @@ class CustomeFormatter(logging.Formatter):
 class ComponentConsole(logging.Handler):
 	def __init__(self, parent):
 		super().__init__()
-		self.widget = QPlainTextEdit(parent)
-		self.widget.setReadOnly(True)
+
+		# Init callback function 
+		self.__callback_onSave__ = None 
+		self.__callback_onClear__ = None
+
+		# Create button save
+		self.__button_SerialControl_Save__ = QPushButton('Save')
+		self.__button_SerialControl_Save__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
+		self.__button_SerialControl_Save__.clicked.connect(self.onClickSaveConsole)
+
+		# Create button clear
+		self.__button_SerialControl_Clear__ = QPushButton('Clear')
+		self.__button_SerialControl_Clear__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
+		self.__button_SerialControl_Clear__.clicked.connect(self.onClickClearConsole)
+
+		# Combine buttons in a row
+		self.__layout_ControlButton__ = QHBoxLayout()
+		self.__layout_ControlButton__.setContentsMargins(0,0,0,0)
+		self.__layout_ControlButton__.setAlignment(Qt.AlignmentFlag.AlignRight)
+		self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Clear__)
+		self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Save__)
+		self.__widget_ControlButton__ = QWidget()
+		self.__widget_ControlButton__.setLayout(self.__layout_ControlButton__)
+
+
+		# Create console from QPlainTextEdit
+		self.__console__ = QPlainTextEdit(parent)
+		self.__console__.setReadOnly(True)
+
+		__layout__ = QVBoxLayout()
+		__layout__.addWidget(self.__console__)
+		__layout__.addWidget(self.__widget_ControlButton__)
+
+		self.widget = QWidget()
+		self.widget.setLayout(__layout__)
+
+	def registerOnSave(self, onSave):
+		self.__callback_onSave__ = onSave
+
+	def registerOnClear(self, onClear):
+		self.__callback_onClear__ = onClear
+
+	def onClickSaveConsole(self):
+		if self.__callback_onSave__ != None:
+			self.__callback_onSave__()
+
+	def onClickClearConsole(self):
+		if self.__callback_onClear__ != None:
+			self.__callback_onClear__()
 
 	def emit(self, record):
 		msg = self.format(record)
-		self.widget.appendHtml(msg)
-		scrollbar = self.widget.verticalScrollBar()
+		self.__console__.appendHtml(msg)
+		scrollbar = self.__console__.verticalScrollBar()
 		scrollbar.setValue(scrollbar.maximum())
 
 	def clear(self):
-		self.widget.clear()
+		self.__console__.clear()
 
 	def getCurrentText(self):
-		return self.widget.toPlainText()
+		return self.__console__.toPlainText()
 
 	def logDebug(self, *arg):
 		logging.debug(*arg)

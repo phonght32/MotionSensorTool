@@ -68,24 +68,10 @@ class MainWindow(QMainWindow):
         # Create component console
         self.__componentConsole__ = ComponentConsole(self)
         self.__componentConsole__.setFormatter(CustomeFormatter())
+        self.__componentConsole__.registerOnSave(self.onClickSaveConsole)
+        self.__componentConsole__.registerOnClear(self.onClickClearConsole)
 
-        self.__button_SerialControl_Save__ = QPushButton('Save')
-        self.__button_SerialControl_Save__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
-        self.__button_SerialControl_Save__.clicked.connect(self.onClickSaveConsole)
-
-        self.__button_SerialControl_Clear__ = QPushButton('Clear')
-        self.__button_SerialControl_Clear__.setFixedWidth(DIMENSION_BUTTON_WIDTH)
-        self.__button_SerialControl_Clear__.clicked.connect(self.onClickClearConsole)
-
-        self.__layout_ControlButton__ = QHBoxLayout()
-        self.__layout_ControlButton__.setContentsMargins(0,0,0,0)
-        self.__layout_ControlButton__.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Clear__)
-        self.__layout_ControlButton__.addWidget(self.__button_SerialControl_Save__)
-        self.__widget_ControlButton__ = QWidget()
-        self.__widget_ControlButton__.setLayout(self.__layout_ControlButton__)
-
-
+        
         self.radiobutton_AnalyzeMag = QRadioButton('Magnetometer')
         self.radiobutton_AnalyzeMag.setChecked(self.__configModeData__['enable_mag_analyze']) 
         self.radiobutton_SerialPlotter = QRadioButton('Serial Plotter')
@@ -122,7 +108,6 @@ class MainWindow(QMainWindow):
         leftPanelLayout.addWidget(self.__widget_SelectFile__)
         leftPanelLayout.addWidget(self.__componentMagAnalyze__)
         leftPanelLayout.addWidget(self.__componentConsole__.widget)
-        leftPanelLayout.addWidget(self.__widget_ControlButton__)
         leftPanelWidget = QWidget()
         leftPanelWidget.setFixedWidth(480)
         leftPanelWidget.setLayout(leftPanelLayout)
