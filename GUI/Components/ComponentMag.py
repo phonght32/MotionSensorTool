@@ -59,8 +59,6 @@ class ComponentMagPlotter(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-        self.CntDisplay3D = 0
-
         
     def plot(self, MagData):
         Time = MagData[:,0]
