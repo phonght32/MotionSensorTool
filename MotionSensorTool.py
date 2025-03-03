@@ -13,7 +13,7 @@ from GUI.Components.ComponentConsole import *
 
 from GUI.Widgets.WidgetSelectFile import *
 
-MODE_IDX_SERIAL_PLOTTER = 0
+MODE_IDX_IMU_DATA = 0
 MODE_IDX_ANALYZE_MAG = 1
 
 
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
 
         # Get current mode display [IMU data, magnetometer]
         if self.__configModeData__['enable_imu_data_analyze'] == 1:
-            self.__currentModeIdx__ = MODE_IDX_SERIAL_PLOTTER
+            self.__currentModeIdx__ = MODE_IDX_IMU_DATA
         elif self.__configModeData__['enable_mag_analyze'] == 1:
             self.__currentModeIdx__ = MODE_IDX_ANALYZE_MAG
 
@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
         self.__radiobutton_ImuData__.setChecked(self.__configModeData__['enable_imu_data_analyze']) 
 
         self.__groupRadioButton_SelectMode__ = QButtonGroup(self)
-        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_ImuData__, MODE_IDX_SERIAL_PLOTTER)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_ImuData__, MODE_IDX_IMU_DATA)
         self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AnalyzeMag__, MODE_IDX_ANALYZE_MAG)
         self.__groupRadioButton_SelectMode__.buttonClicked.connect(self.onChangeMode)
 
@@ -144,17 +144,19 @@ class MainWindow(QMainWindow):
             ComponentMagAnalyze().setVisible(True)
             ComponentImuData().setVisible(False)
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
-        elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
+        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
             ComponentMagPlotter().setVisible(False)
             ComponentMagAnalyze().setVisible(False)
             ComponentImuData().setVisible(True)
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
 
 
-    
+    # When load data from .txt file, runtime data of current selected mode will be cleared.
     def onLoadFile(self, filePath):
+        # Data is seperated by ','
         data = np.loadtxt(filePath, delimiter=',')
 
+        # Create array that contains timestamp. Assume that sample was recorded every 20ms
         num_samples = data.shape[0]
 
         Time = np.empty((num_samples,1), float)
@@ -162,40 +164,50 @@ class MainWindow(QMainWindow):
 
         for idx in range(num_samples):
             Time[idx] = currentTime
-            currentTime += 0.1
+            currentTime += 0.02
 
+        # Display data for mode Mag analyzer
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
             self.__selectedFile_MagAnalyze__ = filePath
-            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
 
             self.__runtime_MagData__ = np.empty((0,4), int)
         
             if data.shape[1] == 3:
                 self.__savedTxt_MagData__ = np.concatenate((Time, data), axis=1)
                 self.__componentMagAnalyze__.setRawData(data)
-                ComponentMagPlotter().plot(self.__savedTxt_MagData__)
+                self.__componentMagPlotter__.plot(self.__savedTxt_MagData__)
             else:
                 print('Incorrect mag data format')
 
-        elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
+        # Display data for mode IMU Data analyzer
+        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
             self.__selectedFile_SerialPlotter__ = filePath
-            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
-
+            
             self.__runtime_ImuData__ = np.empty((0,10), int)
 
             if data.shape[1] == 9:
                 self.__savedTxt_ImuData__ = np.concatenate((Time, data), axis=1)
-                ComponentImuData().plot(self.__savedTxt_ImuData__)
+                self.ComponentImuData.plot(self.__savedTxt_ImuData__)
             else:
                 print('Incorrect all data format')
 
+        self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
+
 
     def DrawData(self):
-        if ComponentSerialControl().getConnectStatus() == True:
-            listData = ComponentSerialControl().getSeriaData()
+        # Only draw data when serial is connecting
+        if self.__componentSerialControl__.getConnectStatus() == True:
+            listData = self.__componentSerialControl__.getSeriaData()
             for data in listData:
+                # Log data to console
+                self.__componentConsole__.logInfo(data[1])
+
+                # Read data to np array
                 splitData = np.array(data[1].split(','), dtype=int)
-                if self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER and splitData.size == 9:
+
+                # Draw IMU data
+                if self.__currentModeIdx__ == MODE_IDX_IMU_DATA and splitData.size == 9:
+                    # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
                     if len(self.__runtime_ImuData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
                         timestamp = 0.0
@@ -206,7 +218,10 @@ class MainWindow(QMainWindow):
                                                                     int(splitData[0]), int(splitData[1]), int(splitData[2]), 
                                                                     int(splitData[3]), int(splitData[4]), int(splitData[5]), 
                                                                     int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
+                
+                # Draw mag data
                 elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
+                    # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
                     if len(self.__runtime_MagData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
                         timestamp = 0.0
@@ -216,13 +231,15 @@ class MainWindow(QMainWindow):
                     self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
 
 
-                self.__componentConsole__.logInfo(data[1])
-
             if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+                # Set raw data which necessary for calculate calibrated data
                 self.__componentMagAnalyze__.setRawData(self.__runtime_MagData__[:,[1,2,3]])
-                ComponentMagPlotter().plot(self.__runtime_MagData__)
-            elif self.__currentModeIdx__ == MODE_IDX_SERIAL_PLOTTER:
-                ComponentImuData().plot(self.__runtime_ImuData__)
+
+                self.__componentMagPlotter__.plot(self.__runtime_MagData__)
+
+
+            elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
+                self.__componentImuData__.plot(self.__runtime_ImuData__)
 
 
 
