@@ -14,9 +14,9 @@ from GUI.Components.ComponentAngle import *
 
 from GUI.Widgets.WidgetSelectFile import *
 
-MODE_IDX_IMU_DATA = 0
-MODE_IDX_ANALYZE_MAG = 1
-MODE_IDX_ANALYZE_ANGLE = 2
+MODE_IDX_IMU_DATA_ANALYZER = 0
+MODE_IDX_MAG_ANALYZER = 1
+MODE_IDX_ANGLE_ANALYZER = 2
 
 
 class MainWindow(QMainWindow):
@@ -45,38 +45,38 @@ class MainWindow(QMainWindow):
         self.__runtime_TimeStartMs__ = 0
 
         # Current selected files
-        self.__selectedFile_SerialPlotter__ = ''
-        self.__selectedFile_MagAnalyze__ = ''
+        self.__selectedFile_ImuDataAnalyzer__ = ''
+        self.__selectedFile_MagAnalyzer__ = ''
         self.__selectedFile_AngleAnalyzer__ = ''
 
         self.__configModeData__ = LoadConfigFile(FILE_CONFIG_WINDOW)
 
         # Get current mode display [IMU data, magnetometer]
-        if self.__configModeData__['enable_imu_data_analyze'] == 1:
-            self.__currentModeIdx__ = MODE_IDX_IMU_DATA
-        elif self.__configModeData__['enable_mag_analyze'] == 1:
-            self.__currentModeIdx__ = MODE_IDX_ANALYZE_MAG
-        elif self.__configModeData__['enable_angle_analyze'] == 1:
-            self.__currentModeIdx__ = MODE_IDX_ANALYZE_ANGLE
+        if self.__configModeData__['enable_imu_data_analyzer'] == 1:
+            self.__currentModeIdx__ = MODE_IDX_IMU_DATA_ANALYZER
+        elif self.__configModeData__['enable_mag_analyzer'] == 1:
+            self.__currentModeIdx__ = MODE_IDX_MAG_ANALYZER
+        elif self.__configModeData__['enable_angle_analyzer'] == 1:
+            self.__currentModeIdx__ = MODE_IDX_ANGLE_ANALYZER
 
         # Create component serial control 
         self.__componentSerialControl__ = ComponentSerialControl()
 
         # Create component IMU data
         self.__componentImuData__ = ComponentImuDataPlotter()
-        self.__componentImuData__.setVisible(self.__configModeData__['enable_imu_data_analyze'])
+        self.__componentImuData__.setVisible(self.__configModeData__['enable_imu_data_analyzer'])
 
         # Create component mag plotter
         self.__componentMagPlotter__ = ComponentMagPlotter()
-        self.__componentMagPlotter__.setVisible(self.__configModeData__['enable_mag_analyze'])
+        self.__componentMagPlotter__.setVisible(self.__configModeData__['enable_mag_analyzer'])
         
         # Create component mag analyzer
         self.__componentMagAnalyze__ = ComponentMagAnalyze()
-        self.__componentMagAnalyze__.setVisible(self.__configModeData__['enable_mag_analyze'])
+        self.__componentMagAnalyze__.setVisible(self.__configModeData__['enable_mag_analyzer'])
 
         # Create component angle analyzer
         self.__componentAnglePlotter__ = ComponentAnglePlotter()
-        self.__componentAnglePlotter__.setVisible(self.__configModeData__['enable_angle_analyze'])
+        self.__componentAnglePlotter__.setVisible(self.__configModeData__['enable_angle_analyzer'])
 
         
         # Create component select file
@@ -89,16 +89,16 @@ class MainWindow(QMainWindow):
         
         # Create radio button for mode selection
         self.__radiobutton_AnalyzeMag__ = QRadioButton('Magnetometer')
-        self.__radiobutton_AnalyzeMag__.setChecked(self.__configModeData__['enable_mag_analyze']) 
+        self.__radiobutton_AnalyzeMag__.setChecked(self.__configModeData__['enable_mag_analyzer']) 
         self.__radiobutton_ImuData__ = QRadioButton('IMU data')
-        self.__radiobutton_ImuData__.setChecked(self.__configModeData__['enable_imu_data_analyze']) 
+        self.__radiobutton_ImuData__.setChecked(self.__configModeData__['enable_imu_data_analyzer']) 
         self.__radiobutton_AngleAnalyzer__ = QRadioButton('Angle')
-        self.__radiobutton_AngleAnalyzer__.setChecked(self.__configModeData__['enable_angle_analyze']) 
+        self.__radiobutton_AngleAnalyzer__.setChecked(self.__configModeData__['enable_angle_analyzer']) 
 
         self.__groupRadioButton_SelectMode__ = QButtonGroup(self)
-        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_ImuData__, MODE_IDX_IMU_DATA)
-        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AnalyzeMag__, MODE_IDX_ANALYZE_MAG)
-        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AngleAnalyzer__, MODE_IDX_ANALYZE_ANGLE)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_ImuData__, MODE_IDX_IMU_DATA_ANALYZER)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AnalyzeMag__, MODE_IDX_MAG_ANALYZER)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AngleAnalyzer__, MODE_IDX_ANGLE_ANALYZER)
         self.__groupRadioButton_SelectMode__.buttonClicked.connect(self.onChangeMode)
 
         self.__groupRadioButton_SelectMode_Layout__ = QHBoxLayout()
@@ -158,7 +158,7 @@ class MainWindow(QMainWindow):
     def onChangeMode(self, object):
         self.__currentModeIdx__ = self.__groupRadioButton_SelectMode__.id(object)
 
-        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+        if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
             # Hide/Unhide widgets
             self.__componentMagPlotter__.setVisible(True)
             self.__componentMagAnalyze__.setVisible(True)
@@ -166,12 +166,12 @@ class MainWindow(QMainWindow):
             self.__componentAnglePlotter__.setVisible(False)
 
             # Update selected file name
-            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyzer__))
 
             # Save current config
             self.saveCurrentConfig()
 
-        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
+        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
             # Hide/Unhide widgets
             self.__componentMagPlotter__.setVisible(False)
             self.__componentMagAnalyze__.setVisible(False)
@@ -179,12 +179,12 @@ class MainWindow(QMainWindow):
             self.__componentAnglePlotter__.setVisible(False)
 
             # Update selected file name
-            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_ImuDataAnalyzer__))
 
             # Save current config
             self.saveCurrentConfig()
 
-        elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ANGLE:
+        elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
             # Hide/Unhide widgets
             self.__componentMagPlotter__.setVisible(False)
             self.__componentMagAnalyze__.setVisible(False)
@@ -199,17 +199,17 @@ class MainWindow(QMainWindow):
 
     def saveCurrentConfig(self):
         data = {
-                "enable_mag_analyze": 0,
-                "enable_imu_data_analyze": 0,
-                "enable_angle_analyze": 0
+                "enable_mag_analyzer": 0,
+                "enable_imu_data_analyzer": 0,
+                "enable_angle_analyzer": 0
                 }
 
-        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
-            data["enable_mag_analyze"] = 1
-        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
-            data["enable_imu_data_analyze"] = 1
-        elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ANGLE:
-            data["enable_angle_analyze"] = 1
+        if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
+            data["enable_mag_analyzer"] = 1
+        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
+            data["enable_imu_data_analyzer"] = 1
+        elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
+            data["enable_angle_analyzer"] = 1
 
 
         jsonString = json.dumps(data)
@@ -233,8 +233,8 @@ class MainWindow(QMainWindow):
             currentTime += 0.02
 
         # Display data for mode IMU Data analyzer
-        if self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
-            self.__selectedFile_SerialPlotter__ = filePath
+        if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
+            self.__selectedFile_ImuDataAnalyzer__ = filePath
             
             self.__runtime_ImuData__ = np.empty((0,10), float)
 
@@ -245,8 +245,8 @@ class MainWindow(QMainWindow):
                 print('Incorrect all data format')
 
         # Display data for mode Mag analyzer
-        elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
-            self.__selectedFile_MagAnalyze__ = filePath
+        elif self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
+            self.__selectedFile_MagAnalyzer__ = filePath
 
             self.__runtime_MagData__ = np.empty((0,4), float)
         
@@ -258,7 +258,7 @@ class MainWindow(QMainWindow):
                 print('Incorrect mag data format')
 
         # Display data for mode angle analyzer
-        elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ANGLE:
+        elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
             self.__selectedFile_AngleAnalyzer__ = filePath
 
             self.__runtime_AngleData__ = np.empty((0,4), float)
@@ -287,7 +287,7 @@ class MainWindow(QMainWindow):
                 splitData = np.array(f)
 
                 # Draw IMU data
-                if self.__currentModeIdx__ == MODE_IDX_IMU_DATA and splitData.size == 9:
+                if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER and splitData.size == 9:
                     # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
                     if len(self.__runtime_ImuData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
@@ -303,7 +303,7 @@ class MainWindow(QMainWindow):
                                                         axis=0)
                 
                 # Draw mag data
-                elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
+                elif self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER and splitData.size == 3:
                     # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
                     if len(self.__runtime_MagData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
@@ -314,7 +314,7 @@ class MainWindow(QMainWindow):
                     self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
 
                 # Draw angle data
-                elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ANGLE and splitData.size == 3:# If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
+                elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER and splitData.size == 3:# If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
                     if len(self.__runtime_AngleData__) == 0:
                         self.__runtime_TimeStartMs__ = time.time()
                         timestamp = 0.0
@@ -325,16 +325,16 @@ class MainWindow(QMainWindow):
 
 
 
-            if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+            if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
                 # Set raw data which necessary for calculate calibrated data
                 self.__componentMagAnalyze__.setRawData(self.__runtime_MagData__[:,[1,2,3]])
 
                 self.__componentMagPlotter__.plot(self.__runtime_MagData__)
 
-            elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
+            elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
                 self.__componentImuData__.plot(self.__runtime_ImuData__)
 
-            elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ANGLE:
+            elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
                 self.__componentAnglePlotter__.plot(self.__runtime_AngleData__)
 
 
