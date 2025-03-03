@@ -164,14 +164,11 @@ class ComponentMagAnalyze(QWidget):
         layout.addWidget(self.__widget_ButtonAction_)
         layout.addWidget(self.__widget_HardIronBias__)
         layout.addWidget(self.__widget_SoftIron__)
-        layout.addStretch()
 
 
         self.setLayout(layout)
 
     
-
- 
 
     def onChangeNormOfMagnetic(self, text):
         self.__current_NormOfGravity__ = text
