@@ -234,11 +234,11 @@ class MainWindow(QMainWindow):
 
         # Display data for mode IMU Data analyzer
         if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
-            self.__selectedFile_ImuDataAnalyzer__ = filePath
-            
-            self.__runtime_ImuData__ = np.empty((0,10), float)
-
             if data.shape[1] == 9:
+                self.__selectedFile_ImuDataAnalyzer__ = filePath
+                self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
+                
+                self.__runtime_ImuData__ = np.empty((0,10), float)
                 self.__savedTxt_ImuData__ = np.concatenate((Time, data), axis=1)
                 self.__componentImuData__.plot(self.__savedTxt_ImuData__)
             else:
@@ -246,11 +246,11 @@ class MainWindow(QMainWindow):
 
         # Display data for mode Mag analyzer
         elif self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
-            self.__selectedFile_MagAnalyzer__ = filePath
-
-            self.__runtime_MagData__ = np.empty((0,4), float)
-        
             if data.shape[1] == 3:
+                self.__selectedFile_MagAnalyzer__ = filePath
+                self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
+
+                self.__runtime_MagData__ = np.empty((0,4), float)
                 self.__savedTxt_MagData__ = np.concatenate((Time, data), axis=1)
                 self.__componentMagAnalyze__.setRawData(data)
                 self.__componentMagPlotter__.plot(self.__savedTxt_MagData__)
@@ -259,18 +259,16 @@ class MainWindow(QMainWindow):
 
         # Display data for mode angle analyzer
         elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
-            self.__selectedFile_AngleAnalyzer__ = filePath
-
-            self.__runtime_AngleData__ = np.empty((0,4), float)
-        
             if data.shape[1] == 3:
+                self.__selectedFile_AngleAnalyzer__ = filePath
+                self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
+
+                self.__runtime_AngleData__ = np.empty((0,4), float)
                 self.__savedTxt_AngleData__ = np.concatenate((Time, data), axis=1)
                 self.__componentAnglePlotter__.plot(self.__savedTxt_AngleData__)
             else:
                 print('Incorrect angle data format')
 
-        
-        self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
 
 
     def DrawData(self):
