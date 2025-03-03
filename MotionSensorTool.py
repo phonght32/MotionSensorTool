@@ -1,11 +1,11 @@
-import sys, os, re
+import sys, os, re, json
 
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QPushButton, QStatusBar, QRadioButton, QButtonGroup
 from PyQt6.QtCore import Qt
 from PyQt6 import QtWidgets
 
 
-from Utils.LoadConfigFile import *
+from Utils.HandleFile import *
 from GUI.Components.ComponentSerialControl import *
 from GUI.Components.ComponentImuData import *
 from GUI.Components.ComponentMag import *
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         self.__selectedFile_SerialPlotter__ = ''
         self.__selectedFile_MagAnalyze__ = ''
 
-        self.__configModeData__ = LoadConfigFile()
+        self.__configModeData__ = LoadConfigFile(FILE_CONFIG_WINDOW)
 
         # Get current mode display [IMU data, magnetometer]
         if self.__configModeData__['enable_imu_data_analyze'] == 1:
@@ -140,15 +140,44 @@ class MainWindow(QMainWindow):
         self.__currentModeIdx__ = self.__groupRadioButton_SelectMode__.id(object)
 
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+            # Hide/Unhide widgets
             ComponentMagPlotter().setVisible(True)
             ComponentMagAnalyze().setVisible(True)
             ComponentImuData().setVisible(False)
+
+            # Update selected file name
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
+
+            # Save current config
+            self.saveCurrentConfig()
+
         elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
+            # Hide/Unhide widgets
             ComponentMagPlotter().setVisible(False)
             ComponentMagAnalyze().setVisible(False)
             ComponentImuData().setVisible(True)
+
+            # Update selected file name
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
+
+            # Save current config
+            self.saveCurrentConfig()
+
+    def saveCurrentConfig(self):
+        data = {
+                "enable_mag_analyze": 0,
+                "enable_imu_data_analyze": 0
+                }
+
+        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+            data["enable_mag_analyze"] = 1
+        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
+            data["enable_imu_data_analyze"] = 1
+
+
+        jsonString = json.dumps(data)
+        SaveConfigFile(FILE_CONFIG_WINDOW, jsonString)
+
 
 
     # When load data from .txt file, runtime data of current selected mode will be cleared.
