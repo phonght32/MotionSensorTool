@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
         self.__componentSerialControl__ = ComponentSerialControl()
 
         # Create component IMU data
-        self.__componentImuData__ = ComponentImuData()
+        self.__componentImuData__ = ComponentImuDataPlotter()
         self.__componentImuData__.setVisible(self.__configModeData__['enable_imu_data_analyze'])
 
         # Create component mag plotter

@@ -12,7 +12,7 @@ from GUI.Config.Config_Widget import *
 
 
 @singleton
-class ComponentImuData(QWidget):
+class ComponentImuDataPlotter(QWidget):
     def __init__(self):
         super().__init__()
 
