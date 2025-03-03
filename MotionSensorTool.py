@@ -71,8 +71,6 @@ class MainWindow(QMainWindow):
         # Create component console
         self.__componentConsole__ = ComponentConsole(self)
         self.__componentConsole__.setFormatter(CustomeFormatter())
-        self.__componentConsole__.registerOnSave(self.onClickSaveConsole)
-        self.__componentConsole__.registerOnClear(self.onClickClearConsole)
 
         
         # Create radio button for mode selection
@@ -153,26 +151,7 @@ class MainWindow(QMainWindow):
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
 
 
-    def onClickSaveConsole(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.FileMode.AnyFile)
-        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
-
-        fileName, fileType = dialog.getSaveFileName(self)
-        if fileName:
-            consoleData = self.__componentConsole__.getCurrentText()
-
-            if '.txt' not in fileName:
-                fileName += '.txt'
-                
-            with open(fileName, 'w') as output:
-                output.write(consoleData)
-
-
-    def onClickClearConsole(self):
-        self.__componentConsole__.clear()
-
-
+    
     def onLoadFile(self, filePath):
         data = np.loadtxt(filePath, delimiter=',')
 
