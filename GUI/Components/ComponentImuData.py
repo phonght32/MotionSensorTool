@@ -107,6 +107,6 @@ class ComponentImuDataPlotter(QWidget):
             lim_min = lim_max - FIGURE_DISPLAY_INTERVAL
         else:
             lim_min = 0
-        self.pyplotFig2D_axes_mag.set_xlim([lim_min, lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION])
+        self.pyplotFig2D_axes_mag.set_xlim([float(lim_min), float(lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION)])
 
         self.__widget_Fig2D__.draw()

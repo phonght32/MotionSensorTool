@@ -79,7 +79,7 @@ class ComponentMagPlotter(QWidget):
             lim_min = lim_max - FIGURE_DISPLAY_INTERVAL
         else:
             lim_min = 0
-        self.pyplotFig2D_axes.set_xlim([lim_min, lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION])
+        self.pyplotFig2D_axes.set_xlim([float(lim_min), float(lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION)])
         self.widgetFig2D.draw()
 
         self.pyplotFig3D_Axes_RawData.cla()

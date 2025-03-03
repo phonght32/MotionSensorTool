@@ -24,16 +24,16 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # Numpy array contains IMU data and timestamp: [timestamp, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z]
-        self.__runtime_ImuData__ = np.empty((0,10), int)
+        self.__runtime_ImuData__ = np.empty((0,10), float)
 
         # Numpy array contains saved IMU data from .txt file
-        self.__savedTxt_ImuData__ = np.empty((0,10), int)
+        self.__savedTxt_ImuData__ = np.empty((0,10), float)
 
         # Numpy array contains magnetometer data and timestamp: [timestamp, mag_x, mag_y, mag_z]
-        self.__runtime_MagData__ = np.empty((0,4), int)
+        self.__runtime_MagData__ = np.empty((0,4), float)
 
         # Numpy array contains saved mag data from .txt file
-        self.__savedTxt_MagData__ = np.empty((0,4), int)
+        self.__savedTxt_MagData__ = np.empty((0,4), float)
 
         # Numpy array contains angle data and timestamp: [timestamp, roll, pitch, yaw]
         self.__runtime_AngleData__ = np.empty((0,4), float)
@@ -236,7 +236,7 @@ class MainWindow(QMainWindow):
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
             self.__selectedFile_MagAnalyze__ = filePath
 
-            self.__runtime_MagData__ = np.empty((0,4), int)
+            self.__runtime_MagData__ = np.empty((0,4), float)
         
             if data.shape[1] == 3:
                 self.__savedTxt_MagData__ = np.concatenate((Time, data), axis=1)
@@ -249,7 +249,7 @@ class MainWindow(QMainWindow):
         elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
             self.__selectedFile_SerialPlotter__ = filePath
             
-            self.__runtime_ImuData__ = np.empty((0,10), int)
+            self.__runtime_ImuData__ = np.empty((0,10), float)
 
             if data.shape[1] == 9:
                 self.__savedTxt_ImuData__ = np.concatenate((Time, data), axis=1)
@@ -282,10 +282,12 @@ class MainWindow(QMainWindow):
                     else:
                         timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_ImuData__ = np.append(self.__runtime_ImuData__, [[timestamp,
-                                                                    int(splitData[0]), int(splitData[1]), int(splitData[2]), 
-                                                                    int(splitData[3]), int(splitData[4]), int(splitData[5]), 
-                                                                    int(splitData[6]), int(splitData[7]), int(splitData[8])]], axis=0)
+                    self.__runtime_ImuData__ = np.append(self.__runtime_ImuData__, 
+                                                        [[timestamp,
+                                                            float(splitData[0]), float(splitData[1]), float(splitData[2]), 
+                                                            float(splitData[3]), float(splitData[4]), float(splitData[5]), 
+                                                            float(splitData[6]), float(splitData[7]), float(splitData[8])]], 
+                                                        axis=0)
                 
                 # Draw mag data
                 elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG and splitData.size == 3:
@@ -296,7 +298,7 @@ class MainWindow(QMainWindow):
                     else:
                         timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, int(splitData[0]), int(splitData[1]), int(splitData[2])]], axis=0)
+                    self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
 
                 # Draw angle data
                 elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ANGLE and splitData.size == 3:# If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
