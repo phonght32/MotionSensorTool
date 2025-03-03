@@ -232,8 +232,20 @@ class MainWindow(QMainWindow):
             Time[idx] = currentTime
             currentTime += 0.02
 
+        # Display data for mode IMU Data analyzer
+        if self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
+            self.__selectedFile_SerialPlotter__ = filePath
+            
+            self.__runtime_ImuData__ = np.empty((0,10), float)
+
+            if data.shape[1] == 9:
+                self.__savedTxt_ImuData__ = np.concatenate((Time, data), axis=1)
+                self.__componentImuData__.plot(self.__savedTxt_ImuData__)
+            else:
+                print('Incorrect all data format')
+
         # Display data for mode Mag analyzer
-        if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
+        elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
             self.__selectedFile_MagAnalyze__ = filePath
 
             self.__runtime_MagData__ = np.empty((0,4), float)
@@ -245,18 +257,19 @@ class MainWindow(QMainWindow):
             else:
                 print('Incorrect mag data format')
 
-        # Display data for mode IMU Data analyzer
-        elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
-            self.__selectedFile_SerialPlotter__ = filePath
-            
-            self.__runtime_ImuData__ = np.empty((0,10), float)
+        # Display data for mode angle analyzer
+        elif self.__currentModeIdx__ == MODE_IDX_ANALYZE_ANGLE:
+            self.__selectedFile_AngleAnalyzer__ = filePath
 
-            if data.shape[1] == 9:
-                self.__savedTxt_ImuData__ = np.concatenate((Time, data), axis=1)
-                self.__componentImuData__.plot(self.__savedTxt_ImuData__)
+            self.__runtime_AngleData__ = np.empty((0,4), float)
+        
+            if data.shape[1] == 3:
+                self.__savedTxt_AngleData__ = np.concatenate((Time, data), axis=1)
+                self.__componentAnglePlotter__.plot(self.__savedTxt_AngleData__)
             else:
-                print('Incorrect all data format')
+                print('Incorrect angle data format')
 
+        
         self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
 
 
