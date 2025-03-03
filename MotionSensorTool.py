@@ -74,21 +74,21 @@ class MainWindow(QMainWindow):
 
         
         # Create radio button for mode selection
-        self.radiobutton_AnalyzeMag = QRadioButton('Magnetometer')
-        self.radiobutton_AnalyzeMag.setChecked(self.__configModeData__['enable_mag_analyze']) 
-        self.radiobutton_SerialPlotter = QRadioButton('IMU data')
-        self.radiobutton_SerialPlotter.setChecked(self.__configModeData__['enable_imu_data_analyze']) 
+        self.__radiobutton_AnalyzeMag__ = QRadioButton('Magnetometer')
+        self.__radiobutton_AnalyzeMag__.setChecked(self.__configModeData__['enable_mag_analyze']) 
+        self.__radiobutton_ImuData__ = QRadioButton('IMU data')
+        self.__radiobutton_ImuData__.setChecked(self.__configModeData__['enable_imu_data_analyze']) 
 
-        self.groupRadioButton = QButtonGroup(self)
-        self.groupRadioButton.addButton(self.radiobutton_SerialPlotter, MODE_IDX_SERIAL_PLOTTER)
-        self.groupRadioButton.addButton(self.radiobutton_AnalyzeMag, MODE_IDX_ANALYZE_MAG)
-        self.groupRadioButton.buttonClicked.connect(self.onChangeMode)
+        self.__groupRadioButton_SelectMode__ = QButtonGroup(self)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_ImuData__, MODE_IDX_SERIAL_PLOTTER)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AnalyzeMag__, MODE_IDX_ANALYZE_MAG)
+        self.__groupRadioButton_SelectMode__.buttonClicked.connect(self.onChangeMode)
 
-        self.groupRadioButtonLayout = QHBoxLayout()
-        self.groupRadioButtonLayout.addWidget(self.radiobutton_SerialPlotter)
-        self.groupRadioButtonLayout.addWidget(self.radiobutton_AnalyzeMag)
-        self.__componentSelectMode__ = QWidget()
-        self.__componentSelectMode__.setLayout(self.groupRadioButtonLayout)
+        self.__groupRadioButton_SelectMode_Layout__ = QHBoxLayout()
+        self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_ImuData__)
+        self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_AnalyzeMag__)
+        self.__groupRadioButton_SelectMode_Widget__ = QWidget()
+        self.__groupRadioButton_SelectMode_Widget__.setLayout(self.__groupRadioButton_SelectMode_Layout__)
 
 
         # Handle logging module
@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
 
         # Create status bar
         statusBar = QStatusBar()
-        statusBar.addWidget(self.__componentSelectMode__)
+        statusBar.addWidget(self.__groupRadioButton_SelectMode_Widget__)
         self.setStatusBar(statusBar)
 
 
@@ -137,7 +137,7 @@ class MainWindow(QMainWindow):
         self.__timerDrawData__.start(20)
 
     def onChangeMode(self, object):
-        self.__currentModeIdx__ = self.groupRadioButton.id(object)
+        self.__currentModeIdx__ = self.__groupRadioButton_SelectMode__.id(object)
 
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
             ComponentMagPlotter().setVisible(True)
