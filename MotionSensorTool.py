@@ -141,9 +141,9 @@ class MainWindow(QMainWindow):
 
         if self.__currentModeIdx__ == MODE_IDX_ANALYZE_MAG:
             # Hide/Unhide widgets
-            ComponentMagPlotter().setVisible(True)
-            ComponentMagAnalyze().setVisible(True)
-            ComponentImuData().setVisible(False)
+            self.__componentMagPlotter__.setVisible(True)
+            self.__componentMagAnalyze__.setVisible(True)
+            self.__componentImuData__.setVisible(False)
 
             # Update selected file name
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyze__))
@@ -153,9 +153,9 @@ class MainWindow(QMainWindow):
 
         elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA:
             # Hide/Unhide widgets
-            ComponentMagPlotter().setVisible(False)
-            ComponentMagAnalyze().setVisible(False)
-            ComponentImuData().setVisible(True)
+            self.__componentMagPlotter__.setVisible(False)
+            self.__componentMagAnalyze__.setVisible(False)
+            self.__componentImuData__.setVisible(True)
 
             # Update selected file name
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_SerialPlotter__))
