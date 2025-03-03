@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         self.__configModeData__ = LoadConfigFile()
 
         # Get current mode display [IMU data, magnetometer]
-        if self.__configModeData__['enable_serial_plotter'] == 1:
+        if self.__configModeData__['enable_imu_data_analyze'] == 1:
             self.__currentModeIdx__ = MODE_IDX_SERIAL_PLOTTER
         elif self.__configModeData__['enable_mag_analyze'] == 1:
             self.__currentModeIdx__ = MODE_IDX_ANALYZE_MAG
@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
 
         # Create component IMU data
         self.__componentImuData__ = ComponentImuData()
-        self.__componentImuData__.setVisible(self.__configModeData__['enable_serial_plotter'])
+        self.__componentImuData__.setVisible(self.__configModeData__['enable_imu_data_analyze'])
 
         # Create component mag plotter
         self.__componentMagPlotter__ = ComponentMagPlotter()
@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
         self.radiobutton_AnalyzeMag = QRadioButton('Magnetometer')
         self.radiobutton_AnalyzeMag.setChecked(self.__configModeData__['enable_mag_analyze']) 
         self.radiobutton_SerialPlotter = QRadioButton('IMU data')
-        self.radiobutton_SerialPlotter.setChecked(self.__configModeData__['enable_serial_plotter']) 
+        self.radiobutton_SerialPlotter.setChecked(self.__configModeData__['enable_imu_data_analyze']) 
 
         self.groupRadioButton = QButtonGroup(self)
         self.groupRadioButton.addButton(self.radiobutton_SerialPlotter, MODE_IDX_SERIAL_PLOTTER)
