@@ -330,10 +330,12 @@ class MainWindow(QMainWindow):
                     self.__componentMagPlotter__.plot(self.__runtime_MagData__)
 
             elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
-                self.__componentImuData__.plot(self.__runtime_ImuData__)
+                if self.__runtime_ImuData__.shape[0] != 0:
+                    self.__componentImuData__.plot(self.__runtime_ImuData__)
 
             elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
-                self.__componentAnglePlotter__.plot(self.__runtime_AngleData__)
+                if self.__runtime_AngleData__.shape[0] != 0:
+                    self.__componentAnglePlotter__.plot(self.__runtime_AngleData__)
 
 
 
