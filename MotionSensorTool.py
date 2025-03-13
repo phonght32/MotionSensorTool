@@ -325,9 +325,9 @@ class MainWindow(QMainWindow):
 
             if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
                 # Set raw data which necessary for calculate calibrated data
-                self.__componentMagAnalyze__.setRawData(self.__runtime_MagData__[:,[1,2,3]])
-
-                self.__componentMagPlotter__.plot(self.__runtime_MagData__)
+                if self.__runtime_MagData__.shape[0] != 0:
+                    self.__componentMagAnalyze__.setRawData(self.__runtime_MagData__[:,[1,2,3]])
+                    self.__componentMagPlotter__.plot(self.__runtime_MagData__)
 
             elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
                 self.__componentImuData__.plot(self.__runtime_ImuData__)
