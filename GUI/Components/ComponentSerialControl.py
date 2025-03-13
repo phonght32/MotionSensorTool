@@ -222,7 +222,7 @@ class ComponentSerialControl(QWidget):
                 self.__current_SerialPortOpened__ = True
                 self.__timerGetData__ = QTimer(self)
                 self.__timerGetData__.timeout.connect(self.TaskGetData)
-                self.__timerGetData__.start(1)
+                self.__timerGetData__.start(100)
                 print('Connect to {}'.format(self.__current_SelectedDeviceName__))
 
             else:
@@ -238,12 +238,11 @@ class ComponentSerialControl(QWidget):
     def TaskGetData(self):
         index = 0
         while self.__current_SerialPort__.in_waiting > 0:
-            
-            timestamp = time.time()
-            index += 1
-            string_data = self.__current_SerialPort__.readline().decode('utf-8')
-
-            self.__current_ListSerialData__.append([timestamp, string_data])
+            string_data = self.__current_SerialPort__.readline().decode('utf-8').strip()
+            if string_data != '':
+                timestamp = time.time()
+                index += 1
+                self.__current_ListSerialData__.append([timestamp, string_data])
 
         if index > 1:
             for i in range(index):
