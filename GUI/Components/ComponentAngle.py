@@ -24,18 +24,9 @@ class ComponentAnglePlotter(QWidget):
         self.pyplotFig2D_axes.grid(True)
         self.pyplotFig2D_axes.set_title("Angle")
 
-        # Configure x axis: value show every 5 and there are 5 seperated members
-        self.pyplotFig2D_axes.xaxis.set_major_locator(MultipleLocator(5))
-        self.pyplotFig2D_axes.xaxis.set_minor_locator(AutoMinorLocator(5))
-
-        # Configure y axis: value show every 10 and there are 5 seperated members
-        self.pyplotFig2D_axes.yaxis.set_major_locator(MultipleLocator(10))
-        self.pyplotFig2D_axes.yaxis.set_minor_locator(AutoMinorLocator(5))
-
         # Create instance for Canvas and Toolbar
         self.widgetFig2D = FigureCanvasQTAgg(self.pyplotFig2D)
         self.widgetToolbar = NavigationToolbar2QT(self.widgetFig2D, self)
-
 
         # Create layout
         layout = QVBoxLayout()
@@ -61,10 +52,12 @@ class ComponentAnglePlotter(QWidget):
         self.pyplotFig2D_axes.legend()
         self.pyplotFig2D_axes.set_title("Angle")
         
+        # Configure x axis: value show every 5 and there are 5 seperated members
         self.pyplotFig2D_axes.xaxis.set_major_locator(MultipleLocator(5))
-        self.pyplotFig2D_axes.yaxis.set_major_locator(MultipleLocator(10))
-
         self.pyplotFig2D_axes.xaxis.set_minor_locator(AutoMinorLocator(5))
+
+        # Configure y axis: value show every 10 and there are 5 seperated members
+        self.pyplotFig2D_axes.yaxis.set_major_locator(MultipleLocator(10))
         self.pyplotFig2D_axes.yaxis.set_minor_locator(AutoMinorLocator(5))
 
         # Display latest [FIGURE_DISPLAY_INTERVAL]s data
