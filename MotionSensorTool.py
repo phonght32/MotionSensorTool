@@ -313,7 +313,8 @@ class MainWindow(QMainWindow):
                         self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
 
                     # Draw angle data
-                    elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER and splitData.size == 3:# If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
+                    elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER and splitData.size == 3:
+                        # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
                         if len(self.__runtime_AngleData__) == 0:
                             self.__runtime_TimeStartMs__ = time.time()
                             timestamp = 0.0
