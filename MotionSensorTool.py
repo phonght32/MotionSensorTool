@@ -281,47 +281,48 @@ class MainWindow(QMainWindow):
 
                 # Read data to np array
                 # splitData = np.array(data[1].split(','), dtype=float)
-                f = [float(x) for x in re.split('[,;]', data[1])]
-                splitData = np.array(f)
+                try:
+                    f = [float(x) for x in re.split('[,;]', data[1])]
+                    splitData = np.array(f)
 
-                # Draw IMU data
-                if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER and splitData.size == 9:
-                    # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
-                    if len(self.__runtime_ImuData__) == 0:
-                        self.__runtime_TimeStartMs__ = time.time()
-                        timestamp = 0.0
-                    else:
-                        timestamp = float(data[0]-self.__runtime_TimeStartMs__)
+                    # Draw IMU data
+                    if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER and splitData.size == 9:
+                        # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
+                        if len(self.__runtime_ImuData__) == 0:
+                            self.__runtime_TimeStartMs__ = time.time()
+                            timestamp = 0.0
+                        else:
+                            timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_ImuData__ = np.append(self.__runtime_ImuData__, 
-                                                        [[timestamp,
-                                                            float(splitData[0]), float(splitData[1]), float(splitData[2]), 
-                                                            float(splitData[3]), float(splitData[4]), float(splitData[5]), 
-                                                            float(splitData[6]), float(splitData[7]), float(splitData[8])]], 
-                                                        axis=0)
-                
-                # Draw mag data
-                elif self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER and splitData.size == 3:
-                    # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
-                    if len(self.__runtime_MagData__) == 0:
-                        self.__runtime_TimeStartMs__ = time.time()
-                        timestamp = 0.0
-                    else:
-                        timestamp = float(data[0]-self.__runtime_TimeStartMs__)
+                        self.__runtime_ImuData__ = np.append(self.__runtime_ImuData__, 
+                                                            [[timestamp,
+                                                                float(splitData[0]), float(splitData[1]), float(splitData[2]), 
+                                                                float(splitData[3]), float(splitData[4]), float(splitData[5]), 
+                                                                float(splitData[6]), float(splitData[7]), float(splitData[8])]], 
+                                                            axis=0)
+                    
+                    # Draw mag data
+                    elif self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER and splitData.size == 3:
+                        # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
+                        if len(self.__runtime_MagData__) == 0:
+                            self.__runtime_TimeStartMs__ = time.time()
+                            timestamp = 0.0
+                        else:
+                            timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
+                        self.__runtime_MagData__ = np.append(self.__runtime_MagData__, [[timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
 
-                # Draw angle data
-                elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER and splitData.size == 3:# If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
-                    if len(self.__runtime_AngleData__) == 0:
-                        self.__runtime_TimeStartMs__ = time.time()
-                        timestamp = 0.0
-                    else:
-                        timestamp = float(data[0]-self.__runtime_TimeStartMs__)
+                    # Draw angle data
+                    elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER and splitData.size == 3:# If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
+                        if len(self.__runtime_AngleData__) == 0:
+                            self.__runtime_TimeStartMs__ = time.time()
+                            timestamp = 0.0
+                        else:
+                            timestamp = float(data[0]-self.__runtime_TimeStartMs__)
 
-                    self.__runtime_AngleData__ = np.append(self.__runtime_AngleData__, [[timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
-
-
+                        self.__runtime_AngleData__ = np.append(self.__runtime_AngleData__, [[timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
+                except:
+                    print('Errors')
 
             if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
                 # Set raw data which necessary for calculate calibrated data
