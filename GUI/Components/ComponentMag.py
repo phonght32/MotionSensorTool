@@ -33,7 +33,6 @@ class ComponentMagPlotter(QWidget):
 
 
         self.pyplotFig3D, (self.pyplotFig3D_Axes_RawData, self.pyplotFig3D_Axes_CalibData) = plt.subplots(1, 2,subplot_kw=dict(projection='3d'))
-        self.pyplotFig3D.canvas.mpl_connect('motion_notify_event', self.on_move)
 
         self.pyplotFig3D_Axes_RawData.grid(True)
         self.pyplotFig3D_Axes_RawData.set_xlabel('MagX')
@@ -101,26 +100,6 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_CalibData.set_title("Calibrated data")
         self.pyplotFig3D.canvas.draw_idle()
 
-    def on_move(self, event):
-        if event.inaxes == self.pyplotFig3D_Axes_RawData:
-            if self.pyplotFig3D_Axes_RawData.button_pressed in self.pyplotFig3D_Axes_RawData._rotate_btn:
-                self.pyplotFig3D_Axes_CalibData.view_init(elev=self.pyplotFig3D_Axes_RawData.elev, azim=self.pyplotFig3D_Axes_RawData.azim)
-            elif self.pyplotFig3D_Axes_RawData.button_pressed in self.pyplotFig3D_Axes_RawData._zoom_btn:
-                self.pyplotFig3D_Axes_CalibData.set_xlim3d(self.pyplotFig3D_Axes_RawData.get_xlim3d())
-                self.pyplotFig3D_Axes_CalibData.set_ylim3d(self.pyplotFig3D_Axes_RawData.get_ylim3d())
-                self.pyplotFig3D_Axes_CalibData.set_zlim3d(self.pyplotFig3D_Axes_RawData.get_zlim3d())
-        elif event.inaxes == self.pyplotFig3D_Axes_CalibData:
-            if self.pyplotFig3D_Axes_CalibData.button_pressed in self.pyplotFig3D_Axes_CalibData._rotate_btn:
-                self.pyplotFig3D_Axes_RawData.view_init(elev=self.pyplotFig3D_Axes_CalibData.elev, azim=self.pyplotFig3D_Axes_CalibData.azim)
-            elif self.pyplotFig3D_Axes_CalibData.button_pressed in self.pyplotFig3D_Axes_CalibData._zoom_btn:
-                self.pyplotFig3D_Axes_RawData.set_xlim3d(self.pyplotFig3D_Axes_CalibData.get_xlim3d())
-                self.pyplotFig3D_Axes_RawData.set_ylim3d(self.pyplotFig3D_Axes_CalibData.get_ylim3d())
-                self.pyplotFig3D_Axes_RawData.set_zlim3d(self.pyplotFig3D_Axes_CalibData.get_zlim3d())
-        else:
-            return
-        self.pyplotFig3D.canvas.draw_idle()
-
-        
 
 @singleton
 class ComponentMagAnalyze(QWidget):
