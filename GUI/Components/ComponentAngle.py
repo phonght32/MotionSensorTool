@@ -58,7 +58,7 @@ class ComponentAnglePlotter(QWidget):
         self.pyplotFig2D_axes.xaxis.set_minor_locator(AutoMinorLocator(5))
 
         # Configure y axis: value show every 10 and there are 5 seperated members
-        self.pyplotFig2D_axes.yaxis.set_major_locator(MultipleLocator(10))
+        self.pyplotFig2D_axes.yaxis.set_major_locator(MultipleLocator(20))
         self.pyplotFig2D_axes.yaxis.set_minor_locator(AutoMinorLocator(5))
 
         # Display latest [FIGURE_DISPLAY_INTERVAL]s data
