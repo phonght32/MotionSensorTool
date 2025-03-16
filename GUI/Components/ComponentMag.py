@@ -100,6 +100,15 @@ class ComponentMagPlotter(QWidget):
         self.pyplotFig3D_Axes_CalibData.set_title("Calibrated data")
         self.pyplotFig3D.canvas.draw_idle()
 
+    def clear(self):
+        self.pyplotFig2D_axes.cla()
+        self.widgetFig2D.draw()
+
+        self.pyplotFig3D_Axes_RawData.cla()
+        self.pyplotFig3D_Axes_CalibData.cla()
+        self.pyplotFig3D.canvas.draw_idle()
+
+
 
 @singleton
 class ComponentMagAnalyze(QWidget):
