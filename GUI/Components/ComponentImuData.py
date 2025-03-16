@@ -110,3 +110,10 @@ class ComponentImuDataPlotter(QWidget):
         self.pyplotFig2D_axes_mag.set_xlim([float(lim_min), float(lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION)])
 
         self.__widget_Fig2D__.draw()
+
+    def clear(self):
+        self.pyplotFig2D_axes_accel.cla()
+        self.pyplotFig2D_axes_gyro.cla()
+        self.pyplotFig2D_axes_mag.cla()
+        self.__widget_Fig2D__.draw()
+
