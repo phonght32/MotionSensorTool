@@ -70,3 +70,7 @@ class ComponentAnglePlotter(QWidget):
 
         # Update figure
         self.widgetFig2D.draw()
+
+    def clear(self):
+        self.pyplotFig2D_axes.cla()
+        self.widgetFig2D.draw()
