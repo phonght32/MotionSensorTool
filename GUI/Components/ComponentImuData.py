@@ -19,16 +19,8 @@ class ComponentImuDataPlotter(QWidget):
         # Create figure and axes. All axes share horizontal axis.
         self.pyplotFig2D, (self.pyplotFig2D_axes_accel, self.pyplotFig2D_axes_gyro, self.pyplotFig2D_axes_mag) = plt.subplots(3, 1, sharex=True)
 
-
         # Configure axes of accel, gyro and mag
-        self.pyplotFig2D_axes_accel.grid(True)
-        self.pyplotFig2D_axes_accel.set_title("Accelerometer")
-
-        self.pyplotFig2D_axes_gyro.grid(True)
-        self.pyplotFig2D_axes_gyro.set_title("Gyroscope")
-
-        self.pyplotFig2D_axes_mag.grid(True)
-        self.pyplotFig2D_axes_mag.set_title("Magnetometer")
+        self.__configFig2D_Data__()
 
         # Create lines
         self.linesRawAccelX, = self.pyplotFig2D_axes_accel.plot([], [], '-r', label='AccelX', lw=FIGURE_LINE_WIDTH)
@@ -55,6 +47,17 @@ class ComponentImuDataPlotter(QWidget):
         layout.addWidget(self.__widget_Toolbar__)
         layout.addWidget(self.__widget_Fig2D__)
         self.setLayout(layout)
+
+    def __configFig2D_Data__(self):
+        self.pyplotFig2D_axes_accel.grid(True)
+        self.pyplotFig2D_axes_accel.set_title("Accelerometer")
+
+        self.pyplotFig2D_axes_gyro.grid(True)
+        self.pyplotFig2D_axes_gyro.set_title("Gyroscope")
+
+        self.pyplotFig2D_axes_mag.grid(True)
+        self.pyplotFig2D_axes_mag.set_title("Magnetometer")
+
 
     # Type of "ImuData" is np.array
     def plot(self, ImuData):
@@ -112,8 +115,14 @@ class ComponentImuDataPlotter(QWidget):
         self.__widget_Fig2D__.draw()
 
     def clear(self):
+        # Clear content
         self.pyplotFig2D_axes_accel.cla()
         self.pyplotFig2D_axes_gyro.cla()
         self.pyplotFig2D_axes_mag.cla()
+
+        # Re-configure settings
+        self.__configFig2D_Data__()
+
+        # Update figure
         self.__widget_Fig2D__.draw()
 

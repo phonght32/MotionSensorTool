@@ -21,8 +21,7 @@ class ComponentAnglePlotter(QWidget):
 
         # Add subplot for drawing angle
         self.pyplotFig2D_axes = self.pyplotFig2D.add_subplot(111)
-        self.pyplotFig2D_axes.grid(True)
-        self.pyplotFig2D_axes.set_title("Angle")
+        self.__configFig2D_Angle__()
 
         # Create instance for Canvas and Toolbar
         self.widgetFig2D = FigureCanvasQTAgg(self.pyplotFig2D)
@@ -34,6 +33,10 @@ class ComponentAnglePlotter(QWidget):
         layout.addWidget(self.widgetToolbar)
         layout.addWidget(self.widgetFig2D)
         self.setLayout(layout)
+
+    def __configFig2D_Angle__(self):
+        self.pyplotFig2D_axes.grid(True)
+        self.pyplotFig2D_axes.set_title("Angle")
 
     # plot function
     def plot(self, AngleData):
@@ -48,9 +51,7 @@ class ComponentAnglePlotter(QWidget):
         self.pyplotFig2D_axes.plot(Time, Roll, label='Roll', lw=FIGURE_LINE_WIDTH)
         self.pyplotFig2D_axes.plot(Time, Pitch, label='Pitch', lw=FIGURE_LINE_WIDTH)
         self.pyplotFig2D_axes.plot(Time, Yaw, label='Yaw', lw=FIGURE_LINE_WIDTH)
-        self.pyplotFig2D_axes.grid(True)
-        self.pyplotFig2D_axes.legend()
-        self.pyplotFig2D_axes.set_title("Angle")
+        self.__configFig2D_Angle__()
         
         # Configure x axis: value show every 5 and there are 5 seperated members
         self.pyplotFig2D_axes.xaxis.set_major_locator(MultipleLocator(5))
@@ -72,5 +73,13 @@ class ComponentAnglePlotter(QWidget):
         self.widgetFig2D.draw()
 
     def clear(self):
+        # Clear content
         self.pyplotFig2D_axes.cla()
+
+        # Re-configure settings
+        self.__configFig2D_Angle__()
+
+        # Update figure
         self.widgetFig2D.draw()
+
+        
