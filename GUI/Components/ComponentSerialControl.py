@@ -304,7 +304,7 @@ class ComponentSerialControl(QWidget):
 
         if index > 1:
             for i in range(index):
-                self.__current_ListSerialData__[i][0] -= (index - i - 1)*0.05
+                self.__current_ListSerialData__[i][0] -= (index - i - 1)*0.025
 
     # This function should be called by application to get serial data
     # Data is a list of [timestamp, data]
