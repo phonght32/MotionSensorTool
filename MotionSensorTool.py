@@ -18,8 +18,8 @@ from GUI.Components.ComponentAngle import *
 from GUI.Widgets.WidgetSelectFile import *
 
 MODE_IDX_IMU_DATA_ANALYZER = 0
-MODE_IDX_MAG_ANALYZER = 1
-MODE_IDX_ANGLE_ANALYZER = 2
+MODE_IDX_ANGLE_ANALYZER = 1
+MODE_IDX_MAG_ANALYZER = 2
 
 NUM_DATATYPE_IMUDATA = 10
 
@@ -100,36 +100,25 @@ class MainWindow(QMainWindow):
         self.__componentConsole__.setFormatter(CustomeFormatter())
 
         # Create radio button for mode selection
-        self.__radiobutton_AnalyzeMag__ = QRadioButton('Magnetometer')
-        self.__radiobutton_AnalyzeMag__.setChecked(
-            self.__configModeData__['enable_mag_analyzer'])
-        self.__radiobutton_ImuData__ = QRadioButton('IMU data')
-        self.__radiobutton_ImuData__.setChecked(
-            self.__configModeData__['enable_imu_data_analyzer'])
-        self.__radiobutton_AngleAnalyzer__ = QRadioButton('Angle')
-        self.__radiobutton_AngleAnalyzer__.setChecked(
-            self.__configModeData__['enable_angle_analyzer'])
+        self.__radiobutton_AnalyzeMag__ = QRadioButton('Calibrate Mag')
+        self.__radiobutton_AnalyzeMag__.setChecked(self.__configModeData__['enable_mag_analyzer'])
+        self.__radiobutton_ImuData__ = QRadioButton('Visualize 10-DoF')
+        self.__radiobutton_ImuData__.setChecked(self.__configModeData__['enable_imu_data_analyzer'])
+        self.__radiobutton_AngleAnalyzer__ = QRadioButton('Visualize Angle')
+        self.__radiobutton_AngleAnalyzer__.setChecked(self.__configModeData__['enable_angle_analyzer'])
 
         self.__groupRadioButton_SelectMode__ = QButtonGroup(self)
-        self.__groupRadioButton_SelectMode__.addButton(
-            self.__radiobutton_ImuData__, MODE_IDX_IMU_DATA_ANALYZER)
-        self.__groupRadioButton_SelectMode__.addButton(
-            self.__radiobutton_AnalyzeMag__, MODE_IDX_MAG_ANALYZER)
-        self.__groupRadioButton_SelectMode__.addButton(
-            self.__radiobutton_AngleAnalyzer__, MODE_IDX_ANGLE_ANALYZER)
-        self.__groupRadioButton_SelectMode__.buttonClicked.connect(
-            self.onChangeMode)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_ImuData__, MODE_IDX_IMU_DATA_ANALYZER)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AngleAnalyzer__, MODE_IDX_ANGLE_ANALYZER)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AnalyzeMag__, MODE_IDX_MAG_ANALYZER)
+        self.__groupRadioButton_SelectMode__.buttonClicked.connect(self.onChangeMode)
 
         self.__groupRadioButton_SelectMode_Layout__ = QHBoxLayout()
-        self.__groupRadioButton_SelectMode_Layout__.addWidget(
-            self.__radiobutton_ImuData__)
-        self.__groupRadioButton_SelectMode_Layout__.addWidget(
-            self.__radiobutton_AnalyzeMag__)
-        self.__groupRadioButton_SelectMode_Layout__.addWidget(
-            self.__radiobutton_AngleAnalyzer__)
+        self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_ImuData__)
+        self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_AngleAnalyzer__)
+        self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_AnalyzeMag__)
         self.__groupRadioButton_SelectMode_Widget__ = QWidget()
-        self.__groupRadioButton_SelectMode_Widget__.setLayout(
-            self.__groupRadioButton_SelectMode_Layout__)
+        self.__groupRadioButton_SelectMode_Widget__.setLayout(self.__groupRadioButton_SelectMode_Layout__)
 
         # Handle logging module
         logging.getLogger().addHandler(self.__componentConsole__)
@@ -152,8 +141,7 @@ class MainWindow(QMainWindow):
         rightPannelLayout.addWidget(self.__componentImuData__)
         rightPannelLayout.addWidget(self.__componentMagPlotter__)
         rightPannelLayout.addWidget(self.__componentAnglePlotter__)
-        rightPannelLayout.addWidget(
-            self.__button_Plotter_Clear__, alignment=Qt.AlignmentFlag.AlignRight)
+        rightPannelLayout.addWidget(self.__button_Plotter_Clear__, alignment=Qt.AlignmentFlag.AlignRight)
         rightPanelWidgets = QWidget()
         rightPanelWidgets.setLayout(rightPannelLayout)
 
@@ -178,8 +166,7 @@ class MainWindow(QMainWindow):
         self.__timerDrawData__.start(1)
 
     def onChangeMode(self, object):
-        self.__currentModeIdx__ = self.__groupRadioButton_SelectMode__.id(
-            object)
+        self.__currentModeIdx__ = self.__groupRadioButton_SelectMode__.id(object)
 
         if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
             # Hide/Unhide widgets
@@ -189,8 +176,7 @@ class MainWindow(QMainWindow):
             self.__componentAnglePlotter__.setVisible(False)
 
             # Update selected file name
-            self.__widget_SelectFile__.setSelectedFileName(
-                os.path.basename(self.__selectedFile_MagAnalyzer__))
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyzer__))
 
             # Save current config
             self.saveCurrentConfig()
@@ -203,8 +189,7 @@ class MainWindow(QMainWindow):
             self.__componentAnglePlotter__.setVisible(False)
 
             # Update selected file name
-            self.__widget_SelectFile__.setSelectedFileName(
-                os.path.basename(self.__selectedFile_ImuDataAnalyzer__))
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_ImuDataAnalyzer__))
 
             # Save current config
             self.saveCurrentConfig()
@@ -217,8 +202,7 @@ class MainWindow(QMainWindow):
             self.__componentAnglePlotter__.setVisible(True)
 
             # Update selected file name
-            self.__widget_SelectFile__.setSelectedFileName(
-                os.path.basename(self.__selectedFile_AngleAnalyzer__))
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_AngleAnalyzer__))
 
             # Save current config
             self.saveCurrentConfig()
@@ -278,8 +262,7 @@ class MainWindow(QMainWindow):
                     os.path.basename(filePath))
 
                 self.__runtime_ImuData__ = np.empty((0, NUM_DATATYPE_IMUDATA+1), float)
-                self.__savedTxt_ImuData__ = np.concatenate(
-                    (Time, data), axis=1)
+                self.__savedTxt_ImuData__ = np.concatenate((Time, data), axis=1)
                 self.__componentImuData__.plot(self.__savedTxt_ImuData__)
             else:
                 print('Incorrect all data format')
@@ -288,12 +271,10 @@ class MainWindow(QMainWindow):
         elif self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
             if data.shape[1] == 3:
                 self.__selectedFile_MagAnalyzer__ = filePath
-                self.__widget_SelectFile__.setSelectedFileName(
-                    os.path.basename(filePath))
+                self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
 
                 self.__runtime_MagData__ = np.empty((0, 4), float)
-                self.__savedTxt_MagData__ = np.concatenate(
-                    (Time, data), axis=1)
+                self.__savedTxt_MagData__ = np.concatenate((Time, data), axis=1)
                 self.__componentMagAnalyze__.setRawData(data)
                 self.__componentMagPlotter__.plot(self.__savedTxt_MagData__)
             else:
@@ -303,14 +284,11 @@ class MainWindow(QMainWindow):
         elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
             if data.shape[1] == 3:
                 self.__selectedFile_AngleAnalyzer__ = filePath
-                self.__widget_SelectFile__.setSelectedFileName(
-                    os.path.basename(filePath))
+                self.__widget_SelectFile__.setSelectedFileName(os.path.basename(filePath))
 
                 self.__runtime_AngleData__ = np.empty((0, 4), float)
-                self.__savedTxt_AngleData__ = np.concatenate(
-                    (Time, data), axis=1)
-                self.__componentAnglePlotter__.plot(
-                    self.__savedTxt_AngleData__)
+                self.__savedTxt_AngleData__ = np.concatenate((Time, data), axis=1)
+                self.__componentAnglePlotter__.plot(self.__savedTxt_AngleData__)
             else:
                 print('Incorrect angle data format')
 
