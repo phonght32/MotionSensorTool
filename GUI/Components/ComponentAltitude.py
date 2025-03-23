@@ -42,3 +42,42 @@ class ComponentAltitudePlotter(QWidget):
         self.pyplotFig2D_axes_altitude.grid(True)
         self.pyplotFig2D_axes_altitude.set_title("Altitude")
 
+    # Type of "ImuData" is np.array
+    def plot(self, ImuData):
+        # Mapping data
+        Time = ImuData[:,0]
+        Baro = ImuData[:,1]
+        Altitude = ImuData[:,2]
+
+        self.linesBaro.set_ydata(Baro)
+        self.linesBaro.set_xdata(Time)
+        self.pyplotFig2D_axes_baro.relim()
+        self.pyplotFig2D_axes_baro.autoscale_view()
+        self.pyplotFig2D_axes_baro.legend()
+
+        self.linesAltitude.set_ydata(Altitude)
+        self.linesAltitude.set_xdata(Time)
+        self.pyplotFig2D_axes_altitude.relim()
+        self.pyplotFig2D_axes_altitude.autoscale_view()
+        self.pyplotFig2D_axes_altitude.legend()
+
+        lim_max = Time[-1]
+        if lim_max - FIGURE_DISPLAY_INTERVAL > 0:
+            lim_min = lim_max - FIGURE_DISPLAY_INTERVAL
+        else:
+            lim_min = 0
+        self.pyplotFig2D_axes_baro.set_xlim([float(lim_min), float(lim_max+FIGURE_DISPLAY_EXTENDED_DURRATION)])
+
+        self.__widget_Fig2D__.draw()
+
+    def clear(self):
+        # Clear content
+        self.pyplotFig2D_axes_baro.cla()
+        self.pyplotFig2D_axes_altitude.cla()
+
+        # Re-configure settings
+        self.__configFig2D_Data__()
+
+        # Update figure
+        self.__widget_Fig2D__.draw()
+

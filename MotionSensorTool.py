@@ -24,6 +24,7 @@ MODE_IDX_ALTITUDE_ANALYZER = 2
 MODE_IDX_MAG_ANALYZER = 3
 
 NUM_DATATYPE_IMUDATA = 10
+NUM_DATATYPE_ALTITUDE = 2
 
 
 class MainWindow(QMainWindow):
@@ -47,6 +48,12 @@ class MainWindow(QMainWindow):
 
         # Numpy array contains saved angle data from .txt file
         self.__savedTxt_AngleData__ = np.empty((0, 4), float)
+
+        # Numpy array contains altitude data and timestamp: [timestamp, baro, altitude]
+        self.__runtime_AltitudeData__ = np.empty((0, NUM_DATATYPE_ALTITUDE+1), float)
+
+        # Numpy array contains saved altitude .txt file
+        self.__savedTxt_AltitudeData__ = np.empty((0, NUM_DATATYPE_ALTITUDE+1), float)
 
         # Time point when start monitor data
         self.__runtime_TimeStartMs__ = 0
@@ -216,7 +223,7 @@ class MainWindow(QMainWindow):
             self.__componentAltitudePlotter__.setVisible(True)
 
             # Update selected file name
-            self.__widget_SelectFile__.setSelectedFileName('')
+            self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_AltitudeAnalyzer__))
 
             # Save current config
             self.saveCurrentConfig()
@@ -236,6 +243,11 @@ class MainWindow(QMainWindow):
         elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
             self.__runtime_AngleData__ = np.empty((0, 4), float)
             self.__componentAnglePlotter__.clear()
+
+        # Clear plotter of altitude
+        elif self.__currentModeIdx__ == MODE_IDX_ALTITUDE_ANALYZER:
+            self.__runtime_AltitudeData__ = np.empty((0, 4), float)
+            self.__componentAltitudePlotter__.clear()
 
     def saveCurrentConfig(self):
         data = {"enable_mag_analyzer": 0,
@@ -367,6 +379,19 @@ class MainWindow(QMainWindow):
 
                         self.__runtime_AngleData__ = np.append(self.__runtime_AngleData__, [
                                                                [timestamp, float(splitData[0]), float(splitData[1]), float(splitData[2])]], axis=0)
+                        
+                    # Draw IMU data
+                    elif self.__currentModeIdx__ == MODE_IDX_ALTITUDE_ANALYZER and splitData.size == NUM_DATATYPE_ALTITUDE:
+                        # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
+                        if len(self.__runtime_AltitudeData__) == 0:
+                            self.__runtime_TimeStartMs__ = time.time()
+                            timestamp = 0.0
+                        else:
+                            timestamp = float(data[0]-self.__runtime_TimeStartMs__)
+
+                        self.__runtime_AltitudeData__ = np.append(self.__runtime_AltitudeData__,
+                                                             [[timestamp, float(splitData[0]), float(splitData[1])]],
+                                                             axis=0)
                 except:
                     print('Errors')
 
@@ -383,8 +408,11 @@ class MainWindow(QMainWindow):
 
             elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
                 if self.__runtime_AngleData__.shape[0] != 0:
-                    self.__componentAnglePlotter__.plot(
-                        self.__runtime_AngleData__)
+                    self.__componentAnglePlotter__.plot(self.__runtime_AngleData__)
+
+            elif self.__currentModeIdx__ == MODE_IDX_ALTITUDE_ANALYZER:
+                if self.__runtime_AltitudeData__.shape[0] != 0:
+                    self.__componentAltitudePlotter__.plot(self.__runtime_AltitudeData__)
 
 
 app = QApplication(sys.argv)
