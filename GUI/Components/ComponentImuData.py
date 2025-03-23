@@ -17,7 +17,7 @@ class ComponentImuDataPlotter(QWidget):
         super().__init__()
 
         # Create figure and axes. All axes share horizontal axis.
-        self.pyplotFig2D, (self.pyplotFig2D_axes_accel, self.pyplotFig2D_axes_gyro, self.pyplotFig2D_axes_mag) = plt.subplots(3, 1, sharex=True)
+        self.pyplotFig2D, (self.pyplotFig2D_axes_accel, self.pyplotFig2D_axes_gyro, self.pyplotFig2D_axes_mag, self.pyplotFig2D_axes_baro) = plt.subplots(4, 1, sharex=True)
 
         # Configure axes of accel, gyro and mag
         self.__configFig2D_Data__()
@@ -35,6 +35,7 @@ class ComponentImuDataPlotter(QWidget):
         self.linesRawMagY, = self.pyplotFig2D_axes_mag.plot([], [], '-g', label='MagY', lw=FIGURE_LINE_WIDTH)
         self.linesRawMagZ, = self.pyplotFig2D_axes_mag.plot([], [], '-b', label='MagZ', lw=FIGURE_LINE_WIDTH)
 
+        self.linesBaro, = self.pyplotFig2D_axes_baro.plot([], [], '-r', label='Baro', lw=FIGURE_LINE_WIDTH)
 
         # Configure Qt canvas and toolbar
         self.__widget_Fig2D__ = FigureCanvasQTAgg(self.pyplotFig2D)
@@ -58,6 +59,9 @@ class ComponentImuDataPlotter(QWidget):
         self.pyplotFig2D_axes_mag.grid(True)
         self.pyplotFig2D_axes_mag.set_title("Magnetometer")
 
+        self.pyplotFig2D_axes_baro.grid(True)
+        self.pyplotFig2D_axes_baro.set_title("Barometer")
+
 
     # Type of "ImuData" is np.array
     def plot(self, ImuData):
@@ -72,6 +76,7 @@ class ComponentImuDataPlotter(QWidget):
         MagX = ImuData[:,7]
         MagY = ImuData[:,8]
         MagZ = ImuData[:,9]
+        Baro = ImuData[:,10]
 
         self.linesRawAccelX.set_ydata(AccelX)
         self.linesRawAccelX.set_xdata(Time)
@@ -103,7 +108,11 @@ class ComponentImuDataPlotter(QWidget):
         self.pyplotFig2D_axes_mag.autoscale_view()
         self.pyplotFig2D_axes_mag.legend()
 
-        self.pyplotFig2D_axes_mag.set_title("Magnetometer")
+        self.linesBaro.set_ydata(Baro)
+        self.linesBaro.set_xdata(Time)
+        self.pyplotFig2D_axes_baro.relim()
+        self.pyplotFig2D_axes_baro.autoscale_view()
+        self.pyplotFig2D_axes_baro.legend()
 
         lim_max = Time[-1]
         if lim_max - FIGURE_DISPLAY_INTERVAL > 0:
@@ -119,6 +128,7 @@ class ComponentImuDataPlotter(QWidget):
         self.pyplotFig2D_axes_accel.cla()
         self.pyplotFig2D_axes_gyro.cla()
         self.pyplotFig2D_axes_mag.cla()
+        self.pyplotFig2D_axes_baro.cla()
 
         # Re-configure settings
         self.__configFig2D_Data__()

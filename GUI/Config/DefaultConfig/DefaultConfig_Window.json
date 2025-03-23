@@ -1,1 +1,1 @@
-{"enable_mag_analyzer": 0, "enable_imu_data_analyzer": 0, "enable_angle_analyzer": 1}
+{"enable_mag_analyzer": 0, "enable_imu_data_analyzer": 1, "enable_angle_analyzer": 0}

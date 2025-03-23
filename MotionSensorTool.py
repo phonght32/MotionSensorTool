@@ -21,16 +21,18 @@ MODE_IDX_IMU_DATA_ANALYZER = 0
 MODE_IDX_MAG_ANALYZER = 1
 MODE_IDX_ANGLE_ANALYZER = 2
 
+NUM_DATATYPE_IMUDATA = 10
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Numpy array contains IMU data and timestamp: [timestamp, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z]
-        self.__runtime_ImuData__ = np.empty((0, 10), float)
+        # Numpy array contains IMU data and timestamp: [timestamp, accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z, baro]
+        self.__runtime_ImuData__ = np.empty((0, NUM_DATATYPE_IMUDATA+1), float)
 
         # Numpy array contains saved IMU data from .txt file
-        self.__savedTxt_ImuData__ = np.empty((0, 10), float)
+        self.__savedTxt_ImuData__ = np.empty((0, NUM_DATATYPE_IMUDATA+1), float)
 
         # Numpy array contains magnetometer data and timestamp: [timestamp, mag_x, mag_y, mag_z]
         self.__runtime_MagData__ = np.empty((0, 4), float)
@@ -229,7 +231,7 @@ class MainWindow(QMainWindow):
 
         # Clear plotter of imu data
         elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
-            self.__runtime_ImuData__ = np.empty((0, 10), float)
+            self.__runtime_ImuData__ = np.empty((0, NUM_DATATYPE_IMUDATA+1), float)
             self.__componentImuData__.clear()
 
         # Clear plotter of angle
@@ -270,12 +272,12 @@ class MainWindow(QMainWindow):
 
         # Display data for mode IMU Data analyzer
         if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
-            if data.shape[1] == 9:
+            if data.shape[1] == NUM_DATATYPE_IMUDATA:
                 self.__selectedFile_ImuDataAnalyzer__ = filePath
                 self.__widget_SelectFile__.setSelectedFileName(
                     os.path.basename(filePath))
 
-                self.__runtime_ImuData__ = np.empty((0, 10), float)
+                self.__runtime_ImuData__ = np.empty((0, NUM_DATATYPE_IMUDATA+1), float)
                 self.__savedTxt_ImuData__ = np.concatenate(
                     (Time, data), axis=1)
                 self.__componentImuData__.plot(self.__savedTxt_ImuData__)
@@ -320,14 +322,15 @@ class MainWindow(QMainWindow):
                 # Log data to console
                 self.__componentConsole__.logInfo(data[1])
 
-                # Read data to np array
-                # splitData = np.array(data[1].split(','), dtype=float)
                 try:
-                    f = [float(x) for x in re.split('[,;]', data[1])]
-                    splitData = np.array(f)
+                    # Read data to np array
+                    # f = [float(x) for x in re.split('[,;]', data[1])]
+                    # splitData = np.array(f)
+
+                    splitData = np.array(data[1].split(','), dtype=float)
 
                     # Draw IMU data
-                    if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER and splitData.size == 9:
+                    if self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER and splitData.size == NUM_DATATYPE_IMUDATA:
                         # If no runtime data before, start draw data from origin. Else, calculate time offset from now to origin
                         if len(self.__runtime_ImuData__) == 0:
                             self.__runtime_TimeStartMs__ = time.time()
@@ -338,11 +341,10 @@ class MainWindow(QMainWindow):
 
                         self.__runtime_ImuData__ = np.append(self.__runtime_ImuData__,
                                                              [[timestamp,
-                                                               float(splitData[0]), float(
-                                                                   splitData[1]), float(splitData[2]),
-                                                               float(splitData[3]), float(
-                                                                   splitData[4]), float(splitData[5]),
-                                                               float(splitData[6]), float(splitData[7]), float(splitData[8])]],
+                                                               float(splitData[0]), float(splitData[1]), float(splitData[2]),
+                                                               float(splitData[3]), float(splitData[4]), float(splitData[5]),
+                                                               float(splitData[6]), float(splitData[7]), float(splitData[8]),
+                                                               float(splitData[9])]],
                                                              axis=0)
 
                     # Draw mag data
