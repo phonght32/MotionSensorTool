@@ -173,7 +173,7 @@ class MainWindow(QMainWindow):
         # Create timer to get data from serial
         self.__timerDrawData__ = QTimer(self)
         self.__timerDrawData__.timeout.connect(self.DrawData)
-        self.__timerDrawData__.start(20)
+        self.__timerDrawData__.start(1)
 
     def onChangeMode(self, object):
         self.__currentModeIdx__ = self.__groupRadioButton_SelectMode__.id(
