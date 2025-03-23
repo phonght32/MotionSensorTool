@@ -14,12 +14,14 @@ from GUI.Components.ComponentImuData import *
 from GUI.Components.ComponentMag import *
 from GUI.Components.ComponentConsole import *
 from GUI.Components.ComponentAngle import *
+from GUI.Components.ComponentAltitude import *
 
 from GUI.Widgets.WidgetSelectFile import *
 
 MODE_IDX_IMU_DATA_ANALYZER = 0
 MODE_IDX_ANGLE_ANALYZER = 1
-MODE_IDX_MAG_ANALYZER = 2
+MODE_IDX_ALTITUDE_ANALYZER = 2
+MODE_IDX_MAG_ANALYZER = 3
 
 NUM_DATATYPE_IMUDATA = 10
 
@@ -53,6 +55,7 @@ class MainWindow(QMainWindow):
         self.__selectedFile_ImuDataAnalyzer__ = ''
         self.__selectedFile_MagAnalyzer__ = ''
         self.__selectedFile_AngleAnalyzer__ = ''
+        self.__selectedFile_AltitudeAnalyzer__ = ''
 
         self.__configModeData__ = LoadConfigFile(FILE_CONFIG_WINDOW)
 
@@ -63,29 +66,31 @@ class MainWindow(QMainWindow):
             self.__currentModeIdx__ = MODE_IDX_MAG_ANALYZER
         elif self.__configModeData__['enable_angle_analyzer'] == 1:
             self.__currentModeIdx__ = MODE_IDX_ANGLE_ANALYZER
+        elif self.__configModeData__['enable_altitude_analyzer'] == 1:
+            self.__currentModeIdx__ = MODE_IDX_ALTITUDE_ANALYZER
 
         # Create component serial control
         self.__componentSerialControl__ = ComponentSerialControl()
 
         # Create component IMU data
         self.__componentImuData__ = ComponentImuDataPlotter()
-        self.__componentImuData__.setVisible(
-            self.__configModeData__['enable_imu_data_analyzer'])
+        self.__componentImuData__.setVisible(self.__configModeData__['enable_imu_data_analyzer'])
 
         # Create component mag plotter
         self.__componentMagPlotter__ = ComponentMagPlotter()
-        self.__componentMagPlotter__.setVisible(
-            self.__configModeData__['enable_mag_analyzer'])
+        self.__componentMagPlotter__.setVisible(self.__configModeData__['enable_mag_analyzer'])
 
         # Create component mag analyzer
         self.__componentMagAnalyze__ = ComponentMagAnalyze()
-        self.__componentMagAnalyze__.setVisible(
-            self.__configModeData__['enable_mag_analyzer'])
+        self.__componentMagAnalyze__.setVisible(self.__configModeData__['enable_mag_analyzer'])
 
         # Create component angle analyzer
         self.__componentAnglePlotter__ = ComponentAnglePlotter()
-        self.__componentAnglePlotter__.setVisible(
-            self.__configModeData__['enable_angle_analyzer'])
+        self.__componentAnglePlotter__.setVisible(self.__configModeData__['enable_angle_analyzer'])
+
+        # Create component altitude analyzer
+        self.__componentAltitudePlotter__ = ComponentAltitudePlotter()
+        self.__componentAltitudePlotter__.setVisible(self.__configModeData__['enable_altitude_analyzer'])
 
         # Create button clear plotter
         self.__button_Plotter_Clear__ = QPushButton('Clear')
@@ -106,16 +111,20 @@ class MainWindow(QMainWindow):
         self.__radiobutton_ImuData__.setChecked(self.__configModeData__['enable_imu_data_analyzer'])
         self.__radiobutton_AngleAnalyzer__ = QRadioButton('Visualize Angle')
         self.__radiobutton_AngleAnalyzer__.setChecked(self.__configModeData__['enable_angle_analyzer'])
+        self.__radiobutton_AltitudeAnalyzer__ = QRadioButton('Visualize Altitude')
+        self.__radiobutton_AltitudeAnalyzer__.setChecked(self.__configModeData__['enable_altitude_analyzer'])
 
         self.__groupRadioButton_SelectMode__ = QButtonGroup(self)
         self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_ImuData__, MODE_IDX_IMU_DATA_ANALYZER)
         self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AngleAnalyzer__, MODE_IDX_ANGLE_ANALYZER)
+        self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AltitudeAnalyzer__, MODE_IDX_ALTITUDE_ANALYZER)
         self.__groupRadioButton_SelectMode__.addButton(self.__radiobutton_AnalyzeMag__, MODE_IDX_MAG_ANALYZER)
         self.__groupRadioButton_SelectMode__.buttonClicked.connect(self.onChangeMode)
 
         self.__groupRadioButton_SelectMode_Layout__ = QHBoxLayout()
         self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_ImuData__)
         self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_AngleAnalyzer__)
+        self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_AltitudeAnalyzer__)
         self.__groupRadioButton_SelectMode_Layout__.addWidget(self.__radiobutton_AnalyzeMag__)
         self.__groupRadioButton_SelectMode_Widget__ = QWidget()
         self.__groupRadioButton_SelectMode_Widget__.setLayout(self.__groupRadioButton_SelectMode_Layout__)
@@ -140,6 +149,7 @@ class MainWindow(QMainWindow):
         rightPannelLayout = QVBoxLayout()
         rightPannelLayout.addWidget(self.__componentImuData__)
         rightPannelLayout.addWidget(self.__componentMagPlotter__)
+        rightPannelLayout.addWidget(self.__componentAltitudePlotter__)
         rightPannelLayout.addWidget(self.__componentAnglePlotter__)
         rightPannelLayout.addWidget(self.__button_Plotter_Clear__, alignment=Qt.AlignmentFlag.AlignRight)
         rightPanelWidgets = QWidget()
@@ -168,12 +178,15 @@ class MainWindow(QMainWindow):
     def onChangeMode(self, object):
         self.__currentModeIdx__ = self.__groupRadioButton_SelectMode__.id(object)
 
+        self.__componentMagPlotter__.setVisible(False)
+        self.__componentMagAnalyze__.setVisible(False)
+        self.__componentImuData__.setVisible(False)
+        self.__componentAnglePlotter__.setVisible(False)
+        self.__componentAltitudePlotter__.setVisible(False)
+
         if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
-            # Hide/Unhide widgets
             self.__componentMagPlotter__.setVisible(True)
             self.__componentMagAnalyze__.setVisible(True)
-            self.__componentImuData__.setVisible(False)
-            self.__componentAnglePlotter__.setVisible(False)
 
             # Update selected file name
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_MagAnalyzer__))
@@ -182,11 +195,7 @@ class MainWindow(QMainWindow):
             self.saveCurrentConfig()
 
         elif self.__currentModeIdx__ == MODE_IDX_IMU_DATA_ANALYZER:
-            # Hide/Unhide widgets
-            self.__componentMagPlotter__.setVisible(False)
-            self.__componentMagAnalyze__.setVisible(False)
             self.__componentImuData__.setVisible(True)
-            self.__componentAnglePlotter__.setVisible(False)
 
             # Update selected file name
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_ImuDataAnalyzer__))
@@ -195,14 +204,19 @@ class MainWindow(QMainWindow):
             self.saveCurrentConfig()
 
         elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
-            # Hide/Unhide widgets
-            self.__componentMagPlotter__.setVisible(False)
-            self.__componentMagAnalyze__.setVisible(False)
-            self.__componentImuData__.setVisible(False)
             self.__componentAnglePlotter__.setVisible(True)
 
             # Update selected file name
             self.__widget_SelectFile__.setSelectedFileName(os.path.basename(self.__selectedFile_AngleAnalyzer__))
+
+            # Save current config
+            self.saveCurrentConfig()
+        
+        elif self.__currentModeIdx__ == MODE_IDX_ALTITUDE_ANALYZER:
+            self.__componentAltitudePlotter__.setVisible(True)
+
+            # Update selected file name
+            self.__widget_SelectFile__.setSelectedFileName('')
 
             # Save current config
             self.saveCurrentConfig()
@@ -226,7 +240,8 @@ class MainWindow(QMainWindow):
     def saveCurrentConfig(self):
         data = {"enable_mag_analyzer": 0,
                 "enable_imu_data_analyzer": 0,
-                "enable_angle_analyzer": 0}
+                "enable_angle_analyzer": 0,
+                "enable_altitude_analyzer": 0}
 
         if self.__currentModeIdx__ == MODE_IDX_MAG_ANALYZER:
             data["enable_mag_analyzer"] = 1
@@ -234,6 +249,8 @@ class MainWindow(QMainWindow):
             data["enable_imu_data_analyzer"] = 1
         elif self.__currentModeIdx__ == MODE_IDX_ANGLE_ANALYZER:
             data["enable_angle_analyzer"] = 1
+        elif self.__currentModeIdx__ == MODE_IDX_ALTITUDE_ANALYZER:
+            data["enable_altitude_analyzer"] = 1
 
         jsonString = json.dumps(data)
         SaveConfigFile(FILE_CONFIG_WINDOW, jsonString)
