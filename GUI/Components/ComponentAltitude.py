@@ -16,18 +16,14 @@ class ComponentAltitudePlotter(QWidget):
         super().__init__()
 
         # Create figure and axes. All axes share horizontal axis.
-        self.pyplotFig2D, (self.pyplotFig2D_axes_baro, self.pyplotFig2D_axes_accel, self.pyplotFig2D_axes_altitude) = plt.subplots(3, 1, sharex=True)
+        self.pyplotFig2D, (self.pyplotFig2D_axes_baro, self.pyplotFig2D_axes_altitude) = plt.subplots(2, 1, sharex=True)
 
         # Configure axes of accel, gyro and mag
         self.__configFig2D_Data__()
 
-
         # Create lines
         self.linesBaro, = self.pyplotFig2D_axes_baro.plot([], [], '-r', label='Baro', lw=FIGURE_LINE_WIDTH)
-
-        self.linesRawAccelX, = self.pyplotFig2D_axes_accel.plot([], [], '-r', label='AccelX', lw=FIGURE_LINE_WIDTH)
-        self.linesRawAccelY, = self.pyplotFig2D_axes_accel.plot([], [], '-g', label='AccelY', lw=FIGURE_LINE_WIDTH)
-        self.linesRawAccelZ, = self.pyplotFig2D_axes_accel.plot([], [], '-b', label='AccelZ', lw=FIGURE_LINE_WIDTH)
+        self.linesAltitude, = self.pyplotFig2D_axes_altitude.plot([], [], '-r', label='Altitude', lw=FIGURE_LINE_WIDTH)
 
         # Configure Qt canvas and toolbar
         self.__widget_Fig2D__ = FigureCanvasQTAgg(self.pyplotFig2D)
@@ -42,9 +38,6 @@ class ComponentAltitudePlotter(QWidget):
     def __configFig2D_Data__(self):
         self.pyplotFig2D_axes_baro.grid(True)
         self.pyplotFig2D_axes_baro.set_title("Barometer")
-    
-        self.pyplotFig2D_axes_accel.grid(True)
-        self.pyplotFig2D_axes_accel.set_title("Accelerometer")
 
         self.pyplotFig2D_axes_altitude.grid(True)
         self.pyplotFig2D_axes_altitude.set_title("Altitude")
